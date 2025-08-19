@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription,Integer> {
     Subscription findSubscriptionById (Integer id);
-
+    List<Subscription> findByStatus(String status);
     List<Subscription> findSubscriptionsByUserId(Integer userId);
 }

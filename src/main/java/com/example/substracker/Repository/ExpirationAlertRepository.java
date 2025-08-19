@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ExpirationAlertRepository extends JpaRepository<ExpirationAlert,Integer> {
     ExpirationAlert findExpirationAlertById(Integer id);
+
+
 }
