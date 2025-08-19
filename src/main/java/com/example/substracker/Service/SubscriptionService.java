@@ -1,30 +1,84 @@
 package com.example.substracker.Service;
 import com.example.substracker.API.ApiException;
+import com.example.substracker.Model.SpendingAnalysis;
 import com.example.substracker.Model.Subscription;
+import com.example.substracker.Model.User;
+import com.example.substracker.Repository.SpendingAnalysisRepository;
 import com.example.substracker.Repository.SubscriptionRepository;
+import com.example.substracker.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
+    private final UserRepository userRepository;
+    private final SpendingAnalysisService spendingAnalysisService;
+    private final SpendingAnalysisRepository spendingAnalysisRepository;
 
+    //all subscriptions for all users
     public List<Subscription> getAllSubscription(){
         return subscriptionRepository.findAll();
     }
 
-    public void addSubscription(Subscription subscription){
-        subscriptionRepository.save(subscription);
-
+    //all subscriptions for specific user
+    public Set<Subscription> getAllSubscriptionByUserId(Integer userId){
+        User user = userRepository.findUserById(userId);
+        if(user == null){
+            throw new ApiException("User not found");
+        }
+        return user.getSubscriptions();
     }
 
-    public void updateSubscription(Integer SubscriptionId,Subscription subscription){
-        Subscription oldSubscription = subscriptionRepository.findSubscriptionById(SubscriptionId);
-        if (oldSubscription == null){
+    //create new Subscription
+    public void addSubscription(Integer userId, Subscription subscription){
+
+        User user = userRepository.findUserById(userId);
+        if(user == null){
+            throw new ApiException("User not found");
+        }
+
+        if(user.getSubscriptions() == null){
+            user.setSubscriptions(new HashSet<>());//create subscription List to the user
+        }
+        subscription.setUser(user);
+        user.getSubscriptions().add(subscription);
+        subscriptionRepository.save(subscription);
+        //creating Spending Analysis:
+        //First time >> Spending analysis creation
+        if(user.getSpendingAnalysis() == null){
+            SpendingAnalysis spendingAnalysis = new SpendingAnalysis();
+            spendingAnalysis.setUser(user);
+            user.setSpendingAnalysis(spendingAnalysis);
+            spendingAnalysisRepository.save(spendingAnalysis);
+        }
+        spendingAnalysisService.createOrUpdateSpendingAnalysis(userId);
+    }
+
+    public void updateSubscription(Integer userId,Integer SubscriptionId,Subscription subscription){
+        User user = userRepository.findUserById(userId);
+        if(user == null){
+            throw new ApiException("User not found");
+        }
+        Set<Subscription> subscriptions = user.getSubscriptions();
+
+        //Chack if user have this subscription ID between his subscriptions
+        Subscription oldSubscription = null;
+        for (Subscription sub : subscriptions){
+            if(sub.getId().equals(SubscriptionId)){
+                oldSubscription = sub;
+            }
+        }
+
+        if(oldSubscription == null){
             throw new ApiException("Subscription not found");
         }
+
         oldSubscription.setSubscriptionName(subscription.getSubscriptionName());
         oldSubscription.setCategory(subscription.getCategory());
         oldSubscription.setPrice(subscription.getPrice());
@@ -34,15 +88,28 @@ public class SubscriptionService {
         oldSubscription.setBillingPeriod(subscription.getBillingPeriod());
         oldSubscription.setNextBillingDate(subscription.getNextBillingDate());
         oldSubscription.setStatus(subscription.getStatus());
-        subscriptionRepository.save(oldSubscription);
 
+        subscriptionRepository.save(oldSubscription);
+        spendingAnalysisService.createOrUpdateSpendingAnalysis(userId);
     }
 
-    public void deleteSubscription (Integer id){
-        Subscription subscription = subscriptionRepository.findSubscriptionById(id);
-        if (subscription == null ){
-            throw new ApiException("id not found");
+    public void deleteSubscription (Integer userId,Integer subscriptionDeletedId){
+        User user = userRepository.findUserById(userId);
+        if(user == null){
+            throw new ApiException("User not found");
         }
-        subscriptionRepository.delete(subscription);
+        Set<Subscription> subscriptions = user.getSubscriptions();
+        Subscription deletedSubscription = null;
+        for (Subscription sub : subscriptions){
+            if(sub.getId().equals(subscriptionDeletedId)){
+                deletedSubscription = sub;
+            }
+        }
+        if(deletedSubscription == null){
+            throw new ApiException("Subscription not found");
+        }
+        user.getSubscriptions().remove(deletedSubscription);
+        subscriptionRepository.delete(deletedSubscription);
+        spendingAnalysisService.createOrUpdateSpendingAnalysis(userId);
     }
 }
