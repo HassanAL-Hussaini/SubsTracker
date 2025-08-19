@@ -44,7 +44,7 @@ public class AiAnalysis {
     @Column(columnDefinition = "datetime not null")
     private LocalDateTime updatedAt;
 
-    //TODO relation:One to One spendingAnalysis and spendingAnalysis is the boss.
+    //Done relation:One to One spendingAnalysis and spendingAnalysis is the boss.
     @OneToOne
     @MapsId
     @JsonIgnore
