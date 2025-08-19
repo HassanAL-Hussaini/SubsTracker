@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Check(constraints = "alertType IN ('urgent', 'normal')")
+@Check(constraints = "alert_type IN ('urgent', 'normal')")
 public class ExpirationAlert {
 
     @Id

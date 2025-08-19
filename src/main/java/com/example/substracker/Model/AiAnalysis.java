@@ -18,7 +18,7 @@ public class AiAnalysis {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer analysisId;
+    private Integer id;
 
     @NotNull(message = "user id is required")
     @Column(columnDefinition = "int not null")

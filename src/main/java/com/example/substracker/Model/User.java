@@ -18,7 +18,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer userId;
+    private Integer id;
 
     @Email(message = "Email should be valid")
     @NotEmpty(message = "Email cannot be empty")
