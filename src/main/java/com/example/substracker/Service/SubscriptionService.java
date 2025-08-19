@@ -29,7 +29,7 @@ public class SubscriptionService {
         subscriptionRepository.save(subscription);
     }
 
-    public void upSubscription(Integer id , Subscription subscription){
+    public void updateSubscription(Integer id , Subscription subscription){
         Subscription oldSubscription = subscriptionRepository.findSubscriptionById(id);
         if (oldSubscription == null){
             throw new ApiException("Subscription not found");
