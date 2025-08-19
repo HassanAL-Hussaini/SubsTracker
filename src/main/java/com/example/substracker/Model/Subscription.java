@@ -22,7 +22,7 @@ public class Subscription {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer subscriptionId;
+    private Integer id;
 
     @NotEmpty(message = "Subscription name cannot be empty")
     @Size(max = 100, message = "Subscription name must not exceed 100 characters")

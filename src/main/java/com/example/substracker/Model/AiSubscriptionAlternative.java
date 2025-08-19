@@ -24,7 +24,7 @@ public class AiSubscriptionAlternative {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer alternativeId;
+    private Integer id;
 
     @NotEmpty(message = "service name cannot be empty")
     @Size(max = 100, message = "service name must not exceed 100 characters")

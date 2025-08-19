@@ -19,7 +19,7 @@ public class SpendingAnalysis {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer spendingAnalysisId;
+    private Integer id;
 
     @NotNull(message = "Digital total is required")
     @PositiveOrZero(message = "Digital total must be >= 0")

@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Check(constraints = "alertType IN ('urgent', 'normal')")
+@Check(constraints = "alert_Type IN ('urgent', 'normal')")
 public class ExpirationAlert {
 
     @Id
@@ -33,7 +33,6 @@ public class ExpirationAlert {
     @Column(columnDefinition = "int not null")
     private Integer daysBeforeExpiry;
 
-    @NotEmpty(message = "alert type cannot be empty")
 
     @NotEmpty(message = "alert type cannot be empty")
     //urgent before 2 days and the normal before 7 days
