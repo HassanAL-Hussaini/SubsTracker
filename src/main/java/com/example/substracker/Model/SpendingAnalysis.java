@@ -1,9 +1,9 @@
 package com.example.substracker.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
-import org.hibernate.annotations.Check;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -69,7 +69,14 @@ public class SpendingAnalysis {
     @Column(columnDefinition = "timestamp not null")
     private LocalDateTime createdAt;
 
-    // TODO: Relation: One-to-One with User
+    // Done: Relation: One-to-One with User
+    @OneToOne
+    @MapsId
+    @JsonIgnore
+    private User user;
     // TODO: Relation: One-to-One with AiAnalysis
+    @OneToOne(cascade = CascadeType.ALL,mappedBy = "spendingAnalysis")
+    @PrimaryKeyJoinColumn
+    private AiAnalysis aiAnalysis;
 
 }

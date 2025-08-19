@@ -1,6 +1,7 @@
 package com.example.substracker.Model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -43,5 +44,9 @@ public class AiAnalysis {
     @Column(columnDefinition = "datetime not null")
     private LocalDateTime updatedAt;
 
-    //TODO relation:
+    //Done relation:One to One spendingAnalysis and spendingAnalysis is the boss.
+    @OneToOne
+    @MapsId
+    @JsonIgnore
+    private SpendingAnalysis spendingAnalysis;
 }
