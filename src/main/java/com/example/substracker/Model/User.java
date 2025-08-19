@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -29,6 +30,7 @@ public class User {
     @NotEmpty(message = "Password cannot be empty")
     @Size(min = 6, message = "Password must be at least 6 characters")
     @Column(nullable = false)
+//    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$\n") //
     private String password;
 
     @NotEmpty(message = "Name cannot be empty")
@@ -52,6 +54,16 @@ public class User {
     @Column(nullable = false)
     private Boolean emailNotificationsEnabled;
 
-    //TODO Relation: One to Many With Subscription.
-    //TODO Relation: One to One with Spending Analysis.
+    //Done Relation: One to Many With Subscription.
+    @OneToMany(cascade = CascadeType.ALL , mappedBy = "user")
+    private Set<Subscription> subscriptions;
+
+
+    //Done Relation: One to One with Spending Analysis.
+    @OneToOne(cascade = CascadeType.ALL,mappedBy = "user")
+    @PrimaryKeyJoinColumn
+    private SpendingAnalysis spendingAnalysis;
+
+
+
 }
