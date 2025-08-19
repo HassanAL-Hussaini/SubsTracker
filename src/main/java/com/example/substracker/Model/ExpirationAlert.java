@@ -48,6 +48,6 @@ public class ExpirationAlert {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
-
+    //Nothing
     //TODO relation: Many to one Subscription.
 }
