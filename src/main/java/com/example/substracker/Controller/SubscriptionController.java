@@ -19,19 +19,19 @@ public class SubscriptionController {
     public ResponseEntity<?> getAllSubscription(){
         return ResponseEntity.status(200).body(subscriptionService.getAllSubscription());
     }
-    @PostMapping("/add")
-    public ResponseEntity<?> addSubscription(@Valid @RequestBody Subscription subscription){
-        subscriptionService.addSubscription(subscription);
-        return ResponseEntity.status(200).body(new ApiResponse("done"));
+    @PostMapping("/add/{userId}")
+    public ResponseEntity<?> addSubscription(@PathVariable Integer userId,@Valid @RequestBody Subscription subscription){
+        subscriptionService.addSubscription(userId,subscription);
+        return ResponseEntity.status(200).body(new ApiResponse("Subscription added successfully"));
     }
     @PutMapping("/up/{id}")
     public ResponseEntity<?> upSubscription(@PathVariable Integer id , @Valid @RequestBody Subscription subscription){
-        subscriptionService.upSubscription(id, subscription);
-        return ResponseEntity.status(200).body(new ApiResponse("done"));
+        subscriptionService.updateSubscription(id, subscription);
+        return ResponseEntity.status(200).body(new ApiResponse("Subscription updated successfully"));
     }
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteSubscription(@PathVariable Integer id){
         subscriptionService.deleteSubscription(id);
-        return ResponseEntity.status(200).body(new ApiResponse("deleted"));
+        return ResponseEntity.status(200).body(new ApiResponse("Subscription deleted successfully"));
     }
 }
