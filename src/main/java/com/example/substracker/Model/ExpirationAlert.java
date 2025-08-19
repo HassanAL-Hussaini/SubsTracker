@@ -1,12 +1,12 @@
 package com.example.substracker.Model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.annotations.Check;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.format.annotation.DateTimeFormat;
 
 
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Check(constraints = "alertType IN ('urgent', 'normal')")
+@Check(constraints = "alert_type IN ('urgent', 'normal')")
 public class ExpirationAlert {
 
     @Id
@@ -48,6 +48,9 @@ public class ExpirationAlert {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
-
-    //TODO relation: Many to one Subscription.
+    //Nothing
+    //Done relation: Many to one Subscription.
+    @ManyToOne
+    @JsonIgnore
+    private Subscription subscription;
 }

@@ -1,6 +1,7 @@
 package com.example.substracker.Model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -18,20 +19,22 @@ public class AiAnalysis {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer analysisId;
+    private Integer id;
 
-    @NotNull(message = "user id is required")
-    @Column(columnDefinition = "int not null")
-    private Integer userId;
+//    No Need
+//    @NotNull(message = "user id is required")
+//    @Column(columnDefinition = "int not null")
+//    private Integer userId;
 
-    @NotNull(message = "spending analysis id is required")
-    @Column(columnDefinition = "int not null")
-    private Integer spendingAnalysisId;
+//    No Need
+//    @NotNull(message = "spending analysis id is required")
+//    @Column(columnDefinition = "int not null")
+//    private Integer spendingAnalysisId;
 
     @NotEmpty(message = "general recommendations cannot be empty")
-    @Size(min = 5, max = 1000, message = "general recommendations must be between 5 and 1000 characters")
-    @Column(columnDefinition = "varchar(1000) not null")
-    private String generalRecommendations;
+//    @Size(min = 5, max = 1000, message = "general recommendations must be between 5 and 1000 characters")
+    @Column(columnDefinition = "TEXT not null")
+    private String generalRecommendations;//from AI
 
     @CreationTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -43,5 +46,9 @@ public class AiAnalysis {
     @Column(columnDefinition = "datetime not null")
     private LocalDateTime updatedAt;
 
-    //TODO relation:
+    //Done relation:One to One spendingAnalysis and spendingAnalysis is the boss.
+    @OneToOne
+    @MapsId
+    @JsonIgnore
+    private SpendingAnalysis spendingAnalysis;
 }
