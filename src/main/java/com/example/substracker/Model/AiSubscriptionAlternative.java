@@ -1,3 +1,4 @@
+//AiSubscriptionAlternative
 package com.example.substracker.Model;
 
 
@@ -43,8 +44,7 @@ public class AiSubscriptionAlternative {
     private String alternativeBillingPeriod;
 
     @NotEmpty(message = "recommendation reason cannot be empty")
-    @Size(min = 5, max = 255, message = "recommendation reason must be between 5 and 255 characters")
-    @Column(columnDefinition = "varchar(255) not null")
+    @Column(columnDefinition = "TEXT not null")
     private String recommendationReason;
 
     @NotNull(message = "potential monthly savings is required")

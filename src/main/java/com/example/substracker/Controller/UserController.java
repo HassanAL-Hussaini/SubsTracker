@@ -4,14 +4,16 @@ import com.example.substracker.API.ApiResponse;
 import com.example.substracker.Model.User;
 import com.example.substracker.Service.UserService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/v1/user")
-@RequiredArgsConstructor
+
 public class UserController {
+
     private final UserService userService;
 
     @GetMapping("/get")
@@ -36,5 +38,4 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.status(200).body(new ApiResponse("User deleted successfully"));
     }
-
 }

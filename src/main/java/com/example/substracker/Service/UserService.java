@@ -3,42 +3,45 @@ package com.example.substracker.Service;
 import com.example.substracker.API.ApiException;
 import com.example.substracker.Model.User;
 import com.example.substracker.Repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.Errors;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
 
-    public List<User> getAllUsers() {
+
+    public List<User> getAllUsers(){
         return userRepository.findAll();
     }
 
-    public void addUser(User user) {
+    public void addUser(User user){
         userRepository.save(user);
     }
 
-    public void updateUser(Integer id,User user){
-        User oldUser = userRepository.getUserById(id);
+    public void deleteUser(Integer userId){
+        User userDeleted = userRepository.findUserById(userId);
+        if(userDeleted == null){
+            throw new ApiException("user Not found");
+        }
+        userRepository.delete(userDeleted);
+    }
 
+    public void updateUser(Integer userId , User user){
+        User oldUser = userRepository.findUserById(userId);
         if(oldUser == null){
-            throw new ApiException("User not found");
+            throw new ApiException("user not found");
         }
         oldUser.setName(user.getName());
         oldUser.setEmail(user.getEmail());
         oldUser.setPassword(user.getPassword());
-        oldUser.setMonthlySalary(user.getMonthlySalary());
         oldUser.setEmailNotificationsEnabled(user.getEmailNotificationsEnabled());
+        oldUser.setMonthlySalary(user.getMonthlySalary());
         userRepository.save(oldUser);
     }
-    public void deleteUser(Integer id) {
-        User user = userRepository.getUserById(id);
-        if (user == null) {
-            throw new ApiException("User not found");
-        }
-        userRepository.delete(user);
-    }
+
 }

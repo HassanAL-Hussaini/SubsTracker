@@ -1,6 +1,7 @@
 package com.example.substracker.Service;
 
 import com.example.substracker.API.ApiException;
+import com.example.substracker.Model.AiAnalysis;
 import com.example.substracker.Model.SpendingAnalysis;
 import com.example.substracker.Model.Subscription;
 import com.example.substracker.Model.User;
@@ -11,33 +12,49 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class SpendingAnalysisService {
     private final SpendingAnalysisRepository spendingAnalysisRepository;
     private final UserRepository userRepository;
-    private final SubscriptionRepository subscriptionRepository;
+    private final AiAnalysisService aiAnalysisService;
 
 
-    public SpendingAnalysis getSpendingAnalysis(Integer userId){
-        User user = userRepository.getUserById(userId);
-        if (user == null) {
+    //there is No Delete in spending Analysis
+
+
+//    public List<SpendingAnalysis> getAllSpendingAnalysis(){
+//        return spendingAnalysisRepository.findAll();
+//    }
+
+    public SpendingAnalysis getSpendingAnalysisByUserId(Integer userId){
+        User user = userRepository.findUserById(userId);
+        if(user == null){
             throw new ApiException("User not found");
         }
+        if(user.getSpendingAnalysis() == null){
+            throw new ApiException("User spending analysis not found because he have not subscriptions yet");
+        }
+        return spendingAnalysisRepository.findSpendingAnalysisById(user.getSpendingAnalysis().getId());
+    }
 
-        // Check if SpendingAnalysis already exists for this user
-        SpendingAnalysis spendingAnalysis = spendingAnalysisRepository.findSpendingANalysisByUserId(userId);
 
-        List<Subscription> subscriptions = subscriptionRepository.findSubscriptionsByUserId(user.getId());
-        if (subscriptions.isEmpty()) {
-            throw new ApiException("No subscriptions found for user");
+    public void createOrUpdateSpendingAnalysis(Integer userId){
+        User user = userRepository.findUserById(userId);
+        Set<Subscription> subscriptions = user.getSubscriptions();
+        SpendingAnalysis spendingAnalysis = user.getSpendingAnalysis();
+        if(user == null){
+            throw new ApiException("user not found");
         }
 
-        // If doesn't exist, create new one
-        if(spendingAnalysis == null) {
-            spendingAnalysis = new SpendingAnalysis();
-            spendingAnalysis.setUser(user);
+        if(subscriptions == null){
+            throw new ApiException("subscriptions not found");
+        }
+
+        if(spendingAnalysis == null){
+            throw new ApiException("spendingAnalysis not found");
         }
 
         // Reset values before recalculating (important for existing records)
@@ -47,23 +64,35 @@ public class SpendingAnalysisService {
         spendingAnalysis.setDigitalSubscriptionsCount(0);
         spendingAnalysis.setServiceSubscriptionsCount(0);
 
-        // Calculate values
-        for(Subscription sub : subscriptions) {
-            if (sub.getCategory().equals("Digital")) {
-                spendingAnalysis.setDigitalSubscriptionsTotalPrice(spendingAnalysis.getDigitalSubscriptionsTotalPrice() + sub.getPrice());
+        for(Subscription subscription : subscriptions){
+            if(subscription.getCategory().equals("Digital")){
+                spendingAnalysis.setDigitalSubscriptionsTotalPrice(spendingAnalysis.getDigitalSubscriptionsTotalPrice() + subscription.getPrice());
                 spendingAnalysis.setDigitalSubscriptionsCount(spendingAnalysis.getDigitalSubscriptionsCount() + 1);
-            } else if (sub.getCategory().equals("Service")) {
-                spendingAnalysis.setServiceSubscriptionsTotalPrice(spendingAnalysis.getServiceSubscriptionsTotalPrice() + sub.getPrice());
+            }else if(subscription.getCategory().equals("Service")){
+                spendingAnalysis.setServiceSubscriptionsTotalPrice(spendingAnalysis.getServiceSubscriptionsTotalPrice() + subscription.getPrice());
                 spendingAnalysis.setServiceSubscriptionsCount(spendingAnalysis.getServiceSubscriptionsCount() + 1);
             }
-            spendingAnalysis.setTotalSpendingPrice(spendingAnalysis.getTotalSpendingPrice() + sub.getPrice());
+            spendingAnalysis.setTotalSpendingPrice(spendingAnalysis.getTotalSpendingPrice() + subscription.getPrice());
         }
 
         spendingAnalysis.setAverageSubscriptionCost(spendingAnalysis.getTotalSpendingPrice() / subscriptions.size());
-        spendingAnalysis.setSpendingToIncomeRatio((spendingAnalysis.getTotalSpendingPrice() / user.getMonthlySalary()) * 100);
         spendingAnalysis.setTotalSubscriptionsCount(subscriptions.size());
+        spendingAnalysis.setSpendingToIncomeRatio((spendingAnalysis.getTotalSpendingPrice() / user.getMonthlySalary()) * 100);
 
+        //TODO AI analysis:
+        if(spendingAnalysis.getAiAnalysis() == null){
+            AiAnalysis aiAnalysis = new AiAnalysis();
+            spendingAnalysis.setAiAnalysis(aiAnalysis);
+            aiAnalysis.setSpendingAnalysis(spendingAnalysis);
+        }
+        aiAnalysisService.addOrUpdateRecommendation(userId , spendingAnalysis.getId());
+        spendingAnalysis.setUser(user);
         spendingAnalysisRepository.save(spendingAnalysis);
-        return spendingAnalysis;
     }
+
+
+
+
+
+
 }

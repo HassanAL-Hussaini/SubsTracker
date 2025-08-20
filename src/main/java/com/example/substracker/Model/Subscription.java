@@ -24,7 +24,7 @@ public class Subscription {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer subscriptionId;
+    private Integer id;
 
     @NotEmpty(message = "Subscription name cannot be empty")
     @Size(max = 100, message = "Subscription name must not exceed 100 characters")
@@ -72,6 +72,7 @@ public class Subscription {
     @ManyToOne
     @JsonIgnore
     private User user;
+
     //Done Relation: One To Many with Expiration Alert
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "subscription")
     private Set<ExpirationAlert> expirationAlerts;
