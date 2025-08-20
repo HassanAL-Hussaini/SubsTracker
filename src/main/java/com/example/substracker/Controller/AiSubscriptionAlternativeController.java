@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.*;
 public class AiSubscriptionAlternativeController {
 
     private final AiSubscriptionAlternativeService aiSubscriptionAlternativeService;
-
+    //made by Hassan
     // Generate & return an AI alternative for a given subscription (saved inside the service)
     @GetMapping("/alternative/{subscriptionId}")
-    public ResponseEntity<?> generateAlternative(@PathVariable Integer subscriptionId) {
+    public ResponseEntity<?> getAiSubAlternativeSubscriptionId(@PathVariable Integer subscriptionId) {
         AiSubscriptionAlternative alt =
-                aiSubscriptionAlternativeService.getAiSubscriptionAlternativeByUserId(subscriptionId);
+                aiSubscriptionAlternativeService.getAiSubscriptionAlternativeBySubscriptionId(subscriptionId);
         return ResponseEntity.status(200).body(alt);
     }
 }

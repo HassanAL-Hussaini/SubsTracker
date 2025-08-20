@@ -7,10 +7,12 @@ import com.example.substracker.Repository.SpendingAnalysisRepository;
 import com.example.substracker.Repository.SubscriptionRepository;
 import com.example.substracker.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -48,6 +50,16 @@ public class SubscriptionService {
         }
         subscription.setUser(user);
         user.getSubscriptions().add(subscription);
+        if(Objects.equals(subscription.getBillingPeriod(), "monthly")){
+            subscription.setNextBillingDate(java.time.LocalDate.now().plusMonths(1));
+        } else if(Objects.equals(subscription.getBillingPeriod(), "3month")){
+            subscription.setNextBillingDate(java.time.LocalDate.now().plusMonths(3));
+        } else if(Objects.equals(subscription.getBillingPeriod(), "6month")){
+            subscription.setNextBillingDate(java.time.LocalDate.now().plusMonths(6));
+        } else if(Objects.equals(subscription.getBillingPeriod(), "yearly")){
+            subscription.setNextBillingDate(java.time.LocalDate.now().plusYears(1));
+        }
+        subscription.setStatus("Active");
         subscriptionRepository.save(subscription);
         //creating Spending Analysis:
         //First time >> Spending analysis creation
@@ -111,5 +123,49 @@ public class SubscriptionService {
         user.getSubscriptions().remove(deletedSubscription);
         subscriptionRepository.delete(deletedSubscription);
         spendingAnalysisService.createOrUpdateSpendingAnalysis(userId);
+    }
+
+    @Scheduled(cron = "0 * * * * *")
+    public void checkStatusSubscriptionExpired() {
+        List<Subscription> subscriptions = subscriptionRepository.findAll();
+        for (Subscription subscription : subscriptions) {
+            if (subscription.getNextBillingDate() == null) {
+                continue; // Skip if next billing date is not set
+            }
+            if (!subscription.getNextBillingDate().isAfter(java.time.LocalDate.now())) {
+                subscription.setStatus("Expired");
+                subscriptionRepository.save(subscription);
+            }
+        }
+    }
+
+    public void renewSubscription(Integer userId, Integer subscriptionId,String billingPeriod) {
+        User user = userRepository.findUserById(userId);
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+        Set<Subscription> subscriptions = user.getSubscriptions();
+        Subscription subscriptionToRenew = null;
+        for (Subscription sub : subscriptions) {
+            if (sub.getId().equals(subscriptionId)) {
+                subscriptionToRenew = sub;
+            }
+        }
+        if (subscriptionToRenew == null) {
+            throw new ApiException("Subscription not found");
+        }
+
+        subscriptionToRenew.setBillingPeriod(billingPeriod);
+        if (Objects.equals(billingPeriod, "monthly")) {
+            subscriptionToRenew.setNextBillingDate(java.time.LocalDate.now().plusMonths(1));
+        } else if (Objects.equals(billingPeriod, "3month")) {
+            subscriptionToRenew.setNextBillingDate(java.time.LocalDate.now().plusMonths(3));
+        } else if (Objects.equals(billingPeriod, "6month")) {
+            subscriptionToRenew.setNextBillingDate(java.time.LocalDate.now().plusMonths(6));
+        } else if (Objects.equals(billingPeriod, "yearly")) {
+            subscriptionToRenew.setNextBillingDate(java.time.LocalDate.now().plusYears(1));
+        }
+        subscriptionToRenew.setStatus("Active");
+        subscriptionRepository.save(subscriptionToRenew);
     }
 }

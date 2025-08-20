@@ -26,7 +26,7 @@ public class AiSubscriptionAlternativeService {
     private static final Set<String> ALLOWED_PERIODS = Set.of("monthly","3month","6month","yearly");
 
     // اسم الميثود باقٍ كما هو عندك (يستقبل subscriptionId)
-    public AiSubscriptionAlternative getAiSubscriptionAlternativeByUserId(Integer subscriptionId){
+    public AiSubscriptionAlternative getAiSubscriptionAlternativeBySubscriptionId(Integer subscriptionId){
         Subscription s = subscriptionRepository.findSubscriptionById(subscriptionId);
         if (s == null) throw new ApiException("Subscription not found");
 

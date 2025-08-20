@@ -49,4 +49,11 @@ public class SubscriptionController {
         subscriptionService.deleteSubscription(userId , subscriptionDeletedId);
         return ResponseEntity.status(200).body(new ApiResponse("Subscription deleted successfully"));
     }
+
+    // Renew subscription
+    @PutMapping("/renew/{userId}/{subscriptionId}/{billingPeriod}")
+    public ResponseEntity<?> renewSubscription(@PathVariable Integer userId, @PathVariable Integer subscriptionId, @PathVariable String billingPeriod) {
+        subscriptionService.renewSubscription(userId, subscriptionId, billingPeriod);
+        return ResponseEntity.status(200).body(new ApiResponse("Subscription renewed successfully"));
+    }
 }

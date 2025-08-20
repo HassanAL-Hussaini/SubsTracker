@@ -47,20 +47,24 @@ public class Subscription {
     @Column(nullable = false, length = 20)
     private String billingPeriod;
 
-    @NotNull(message = "Next billing date is required")
     @FutureOrPresent(message = "Next billing date cannot be in the past")
     @Column(nullable = false)
     private LocalDate nextBillingDate;
 
-    @NotEmpty(message = "Status cannot be empty")
     @Pattern(regexp = "Active|Expired", message = "Status must be either Active or Expired")
     @Column(nullable = false, length = 20)
     private String status;
+
+    @Size(max = 255, message = "URL must not exceed 255 characters")
+    @Column( columnDefinition = "TEXT")
+    private String url;
 
     @NotEmpty(message = "description cannot be empty")
     @Size(max = 255, message = "Description must not exceed 255 characters")
     @Column(nullable = false ,columnDefinition = "TEXT")
     private String description;
+
+
 
     @CreationTimestamp
     private LocalDateTime createdAt;

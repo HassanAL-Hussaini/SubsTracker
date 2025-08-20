@@ -1,5 +1,6 @@
 package com.example.substracker.Service;
 
+import com.example.substracker.API.ApiException;
 import com.example.substracker.Model.AiAnalysis;
 import com.example.substracker.Model.SpendingAnalysis;
 import com.example.substracker.Model.User;
@@ -24,7 +25,8 @@ public class AiAnalysisService {
         User user = userRepository.findUserById(userId);
         SpendingAnalysis spendingAnalysis = spendingAnalysisRepository.findSpendingAnalysisById(spendingAnalysisId);
         if(spendingAnalysis == null){
-            throw new RuntimeException("spending AnalysisId not found");
+            //change from runtime exception to ApiException
+            throw new ApiException("spending AnalysisId not found");
         }
         AiAnalysis aiAnalysis = spendingAnalysis.getAiAnalysis();
         String prompt = """
