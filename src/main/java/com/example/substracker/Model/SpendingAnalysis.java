@@ -24,7 +24,7 @@ public class SpendingAnalysis {
     @NotNull(message = "Digital total is required")
     @PositiveOrZero(message = "Digital total must be >= 0")
     @Column(columnDefinition = "double not null")
-    private Double digitalSubscriptionsTotalPrice =0.0;
+    private Double digitalSubscriptionsTotalPrice = 0.0;
 
     @NotNull(message = "Service total is required")
     @PositiveOrZero(message = "Service total must be >= 0")
