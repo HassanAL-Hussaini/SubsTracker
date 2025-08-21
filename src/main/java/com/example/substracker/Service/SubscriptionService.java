@@ -147,7 +147,7 @@ public class SubscriptionService {
         Set<Subscription> subscriptions = user.getSubscriptions();
         Subscription subscriptionToRenew = null;
         for (Subscription sub : subscriptions) {
-            if (sub.getId().equals(subscriptionId)) {
+            if (sub.getId().equals(subscriptionId) && sub.getStatus().equals("Expired")) {
                 subscriptionToRenew = sub;
             }
         }
