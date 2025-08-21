@@ -76,6 +76,7 @@ public class Subscription {
     @ManyToOne
     @JsonIgnore
     private User user;
+
     //Done Relation: One To Many with Expiration Alert
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "subscription")
     private Set<ExpirationAlert> expirationAlerts;

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -167,5 +168,32 @@ public class SubscriptionService {
         }
         subscriptionToRenew.setStatus("Active");
         subscriptionRepository.save(subscriptionToRenew);
+    }
+
+    //Mshari
+    public List<Subscription> getUpcomingForUser(Integer userId){
+        List<Subscription> subscriptions = subscriptionRepository.findByUser_IdAndStatusAndNextBillingDateGreaterThanEqualOrderByNextBillingDateAsc
+                (userId,"Active",LocalDate.now());
+        return subscriptions;
+    }
+
+    //Mshari
+    public List<Subscription> getDueWithinDays(Integer userId,int days){
+        if (days < 1 ){
+            throw new ApiException("days must be more 1day");
+        }
+        LocalDate today = LocalDate.now();
+        LocalDate to = today.plusDays(days);
+        return subscriptionRepository.findByUser_IdAndStatusAndNextBillingDateBetweenOrderByNextBillingDateAsc
+                (userId,"Active",today,to);
+    }
+
+    //Mshari
+    public List<Subscription> getActiveSubscriptions(Integer userId){
+        return subscriptionRepository.findSubscriptionByUserIdAndStatus(userId,"Active");
+    }
+    //Mshari
+    public List<Subscription> getExpiredByUser(Integer userId){
+        return subscriptionRepository.findSubscriptionByUserIdAndStatus(userId,"Expired");
     }
 }
