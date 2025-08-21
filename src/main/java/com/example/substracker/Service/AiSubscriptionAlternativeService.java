@@ -4,8 +4,10 @@ import com.example.substracker.API.ApiException;
 import com.example.substracker.DTO.AiSubscriptionAlternativeDTOOut;
 import com.example.substracker.Model.AiSubscriptionAlternative;
 import com.example.substracker.Model.Subscription;
+import com.example.substracker.Model.User;
 import com.example.substracker.Repository.AiSubscriptionAlternativeRepository;
 import com.example.substracker.Repository.SubscriptionRepository;
+import com.example.substracker.Repository.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +25,16 @@ public class AiSubscriptionAlternativeService {
     private final AiSubscriptionAlternativeRepository aiSubscriptionAlternativeRepository;
     private final AiService aiService; // خدمة محادثة AI لديك
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final UserRepository userRepository;
 
     private static final Set<String> ALLOWED_PERIODS = Set.of("monthly","3month","6month","yearly");
 
     // اسم الميثود باقٍ كما هو عندك (يستقبل subscriptionId)
-    public AiSubscriptionAlternative getAiSubscriptionAlternativeBySubscriptionId(Integer subscriptionId){
+    public AiSubscriptionAlternative getAiSubscriptionAlternativeBySubscriptionId(Integer userId,Integer subscriptionId){
         Subscription s = subscriptionRepository.findSubscriptionById(subscriptionId);
         if (s == null) throw new ApiException("Subscription not found");
+        User user = userRepository.findUserById(userId);
+        if(user.getIsSubscribed() == false) throw new ApiException("User are not subscribed");
 
         // 1) البرومبت
         String prompt = buildPrompt(s);
@@ -84,8 +89,8 @@ public class AiSubscriptionAlternativeService {
     }
 
     // Method to return DTO instead of entity
-    public AiSubscriptionAlternativeDTOOut getAiSubscriptionAlternativeDTOOutBySubscriptionId(Integer subscriptionId){
-        AiSubscriptionAlternative alternative = getAiSubscriptionAlternativeBySubscriptionId(subscriptionId);
+    public AiSubscriptionAlternativeDTOOut getAiSubscriptionAlternativeDTOOutBySubscriptionId(Integer userId,Integer subscriptionId){
+        AiSubscriptionAlternative alternative = getAiSubscriptionAlternativeBySubscriptionId(userId,subscriptionId);
 
         return new AiSubscriptionAlternativeDTOOut(
                 alternative.getAlternativeServiceName(),
