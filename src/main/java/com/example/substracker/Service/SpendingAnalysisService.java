@@ -137,14 +137,23 @@ public class SpendingAnalysisService {
         spendingAnalysis.setTotalSubscriptionsCount(subscriptions.size());
         spendingAnalysis.setSpendingToIncomeRatio((spendingAnalysis.getTotalSpendingPrice() / user.getMonthlySalary()) * 100);
 
+        if(user.getIsSubscribed() == true){
         //AI analysis:
-        if(spendingAnalysis.getAiAnalysis() == null){
-            AiAnalysis aiAnalysis = new AiAnalysis();
-            spendingAnalysis.setAiAnalysis(aiAnalysis);
-            aiAnalysis.setSpendingAnalysis(spendingAnalysis);
+            if(spendingAnalysis.getAiAnalysis() == null){
+                AiAnalysis aiAnalysis = new AiAnalysis();
+                spendingAnalysis.setAiAnalysis(aiAnalysis);
+                aiAnalysis.setSpendingAnalysis(spendingAnalysis);
+            }
+            aiAnalysisService.addOrUpdateRecommendation(userId , spendingAnalysis.getId());
+            spendingAnalysis.setUser(user);
+            spendingAnalysisRepository.save(spendingAnalysis);
+            return;//end of the method if the user Subscribed
         }
-        aiAnalysisService.addOrUpdateRecommendation(userId , spendingAnalysis.getId());
+        //if the user is not Subscribed
+        spendingAnalysis.setAiAnalysis(null);
+
         spendingAnalysis.setUser(user);
         spendingAnalysisRepository.save(spendingAnalysis);
+
     }
 }

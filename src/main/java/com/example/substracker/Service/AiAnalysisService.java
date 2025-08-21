@@ -28,6 +28,8 @@ public class AiAnalysisService {
         if(user == null){
             throw new ApiException("User not found");
         }
+        // Ai close for the unsubscriber users
+        if(user.getIsSubscribed() == false) return;
 
         SpendingAnalysis spendingAnalysis = spendingAnalysisRepository.findSpendingAnalysisById(spendingAnalysisId);
         if(spendingAnalysis == null){
@@ -96,21 +98,31 @@ public class AiAnalysisService {
 
     public AiAnalysisDTOOut getAiAnalysisDTOOutByUserId(Integer userId){
         User user = userRepository.findUserById(userId);
+
         if(user == null){
             throw new ApiException("User not found");
         }
+
         if(user.getSpendingAnalysis() == null){
             throw new ApiException("User spending analysis not found");
         }
+
         if(user.getSpendingAnalysis().getAiAnalysis() == null){
             throw new ApiException("AI Analysis not found for this user");
         }
 
+        if(user.getIsSubscribed() == false){
+            throw new ApiException("User is not subscribed");
+        }
+//        if(user.getIsSubscribed() == false){
+//            throw new  ApiException("User is not subscribed");
+//        }
         AiAnalysis aiAnalysis = user.getSpendingAnalysis().getAiAnalysis();
 
         return new AiAnalysisDTOOut(
                 aiAnalysis.getGeneralRecommendations()
         );
+
     }
 
 }

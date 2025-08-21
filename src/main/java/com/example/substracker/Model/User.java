@@ -1,5 +1,7 @@
 package com.example.substracker.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -63,6 +65,12 @@ public class User {
     @PrimaryKeyJoinColumn
     private SpendingAnalysis spendingAnalysis;
 
+    @OneToOne(cascade = CascadeType.ALL,mappedBy = "user")
+    @PrimaryKeyJoinColumn
+    private PaymentRequest paymentRequest;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)//user can't edit this filed.
+    private Boolean isSubscribed = false;
 
 
 }
