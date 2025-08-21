@@ -44,4 +44,16 @@ public class UserService {
         userRepository.save(oldUser);
     }
 
+    //Mshari
+    public User triggerNotifications(Integer userId){
+        User user = userRepository.findUserById(userId);
+        if (user == null){
+            throw new ApiException("User not found");
+        }
+        boolean newState = !Boolean.TRUE.equals(user.getEmailNotificationsEnabled());
+        user.setEmailNotificationsEnabled(newState);
+        userRepository.save(user);
+        return user;
+    }
+
 }
