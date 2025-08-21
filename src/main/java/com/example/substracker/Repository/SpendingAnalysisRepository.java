@@ -9,4 +9,5 @@ public interface SpendingAnalysisRepository extends JpaRepository<SpendingAnalys
     SpendingAnalysis findSpendingAnalysisById(Integer id);
 
     SpendingAnalysis findSpendingANalysisByUserId(Integer userId);
+
 }

@@ -1,6 +1,7 @@
 package com.example.substracker.Service;
 
 import com.example.substracker.API.ApiException;
+import com.example.substracker.DTO.AiSubscriptionAlternativeDTOOut;
 import com.example.substracker.Model.AiSubscriptionAlternative;
 import com.example.substracker.Model.Subscription;
 import com.example.substracker.Repository.AiSubscriptionAlternativeRepository;
@@ -80,6 +81,42 @@ public class AiSubscriptionAlternativeService {
 
         // 6) حفظ وإرجاع (createdAt يتعبّى تلقائيًا)
         return aiSubscriptionAlternativeRepository.save(alt);
+    }
+
+    // Method to return DTO instead of entity
+    public AiSubscriptionAlternativeDTOOut getAiSubscriptionAlternativeDTOOutBySubscriptionId(Integer subscriptionId){
+        AiSubscriptionAlternative alternative = getAiSubscriptionAlternativeBySubscriptionId(subscriptionId);
+
+        return new AiSubscriptionAlternativeDTOOut(
+                alternative.getAlternativeServiceName(),
+                alternative.getAlternativePrice(),
+                alternative.getAlternativeBillingPeriod(),
+                alternative.getRecommendationReason(),
+                alternative.getPotentialMonthlySavings()
+        );
+    }
+
+    // Method to convert existing entity to DTO
+    public AiSubscriptionAlternativeDTOOut convertToDTO(AiSubscriptionAlternative alternative) {
+        if (alternative == null) {
+            throw new ApiException("AiSubscriptionAlternative cannot be null");
+        }
+
+        return new AiSubscriptionAlternativeDTOOut(
+                alternative.getAlternativeServiceName(),
+                alternative.getAlternativePrice(),
+                alternative.getAlternativeBillingPeriod(),
+                alternative.getRecommendationReason(),
+                alternative.getPotentialMonthlySavings()
+        );
+    }
+
+    // Method to get DTO by alternative ID (if you have the ID directly)
+    public AiSubscriptionAlternativeDTOOut getAiSubscriptionAlternativeDTOOutById(Integer alternativeId) {
+        AiSubscriptionAlternative alternative = aiSubscriptionAlternativeRepository.findById(alternativeId)
+                .orElseThrow(() -> new ApiException("AI Subscription Alternative not found"));
+
+        return convertToDTO(alternative);
     }
 
     // ---------- Helpers ----------

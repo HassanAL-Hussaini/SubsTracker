@@ -3,6 +3,7 @@ package com.example.substracker.Controller;
 import com.example.substracker.Model.AiSubscriptionAlternative;
 import com.example.substracker.Service.AiSubscriptionAlternativeService;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.connector.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,5 +20,10 @@ public class AiSubscriptionAlternativeController {
         AiSubscriptionAlternative alt =
                 aiSubscriptionAlternativeService.getAiSubscriptionAlternativeBySubscriptionId(subscriptionId);
         return ResponseEntity.status(200).body(alt);
+    }
+
+    @GetMapping("/get/Ai-subscription-alternative-DTO/{subscriptionId}")
+    public ResponseEntity<?> getAiAlterDTOBySubId(@PathVariable Integer subscriptionId){
+        return ResponseEntity.status(200).body(aiSubscriptionAlternativeService.getAiSubscriptionAlternativeDTOOutBySubscriptionId(subscriptionId));
     }
 }

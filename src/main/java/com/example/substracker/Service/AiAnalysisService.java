@@ -1,6 +1,7 @@
 package com.example.substracker.Service;
 
 import com.example.substracker.API.ApiException;
+import com.example.substracker.DTO.AiAnalysisDTOOut;
 import com.example.substracker.Model.AiAnalysis;
 import com.example.substracker.Model.SpendingAnalysis;
 import com.example.substracker.Model.User;
@@ -19,16 +20,26 @@ public class AiAnalysisService {
     private final AiAnalysisRepository aiAnalysisRepository;
     private final UserRepository userRepository;
     private final AiService aiService;
+
     //create update delete To spending Analysis will affect the AI Analysis directly.
-    public void addOrUpdateRecommendation(Integer userId,Integer spendingAnalysisId){
+    public void addOrUpdateRecommendation(Integer userId, Integer spendingAnalysisId){
 
         User user = userRepository.findUserById(userId);
+        if(user == null){
+            throw new ApiException("User not found");
+        }
+
         SpendingAnalysis spendingAnalysis = spendingAnalysisRepository.findSpendingAnalysisById(spendingAnalysisId);
         if(spendingAnalysis == null){
             //change from runtime exception to ApiException
             throw new ApiException("spending AnalysisId not found");
         }
+
         AiAnalysis aiAnalysis = spendingAnalysis.getAiAnalysis();
+        if(aiAnalysis == null){
+            throw new ApiException("AI Analysis not found");
+        }
+
         String prompt = """
         You are an assistant that generates a short financial recommendation for a user.
         You have access to the following spending analysis attributes:
@@ -60,6 +71,7 @@ public class AiAnalysisService {
                 spendingAnalysis.getServiceSubscriptionsCount(),
                 user.getMonthlySalary()
         );
+
         String chatResponse = aiService.chat(prompt);
         if(chatResponse != null){
             aiAnalysis.setGeneralRecommendations(chatResponse);
@@ -71,9 +83,34 @@ public class AiAnalysisService {
     public AiAnalysis getAiAnalysisByUserId(Integer userId){
         User user = userRepository.findUserById(userId);
         if(user == null){
-            throw new RuntimeException("User not found");
+            throw new ApiException("User not found");
         }
-        return  user.getSpendingAnalysis().getAiAnalysis();
+        if(user.getSpendingAnalysis() == null){
+            throw new ApiException("User spending analysis not found");
+        }
+        if(user.getSpendingAnalysis().getAiAnalysis() == null){
+            throw new ApiException("AI Analysis not found for this user");
+        }
+        return user.getSpendingAnalysis().getAiAnalysis();
+    }
+
+    public AiAnalysisDTOOut getAiAnalysisDTOOutByUserId(Integer userId){
+        User user = userRepository.findUserById(userId);
+        if(user == null){
+            throw new ApiException("User not found");
+        }
+        if(user.getSpendingAnalysis() == null){
+            throw new ApiException("User spending analysis not found");
+        }
+        if(user.getSpendingAnalysis().getAiAnalysis() == null){
+            throw new ApiException("AI Analysis not found for this user");
+        }
+
+        AiAnalysis aiAnalysis = user.getSpendingAnalysis().getAiAnalysis();
+
+        return new AiAnalysisDTOOut(
+                aiAnalysis.getGeneralRecommendations()
+        );
     }
 
 }

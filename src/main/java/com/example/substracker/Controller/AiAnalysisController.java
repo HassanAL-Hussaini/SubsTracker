@@ -25,4 +25,10 @@ public class AiAnalysisController {
                 .status(200)
                 .body(aiAnalysisService.getAiAnalysisByUserId(userId));
     }
+
+    @GetMapping("/get/user/{userId}/dto")
+    public ResponseEntity<?> getAiAnalysisDTOByUserId(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(aiAnalysisService.getAiAnalysisDTOOutByUserId(userId));
+    }
+
 }

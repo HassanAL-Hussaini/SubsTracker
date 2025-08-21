@@ -23,6 +23,16 @@ public class SubscriptionController {
     public ResponseEntity<?> getAllSubscriptions() {
         return ResponseEntity.status(200).body(subscriptionService.getAllSubscription());
     }
+    // Get all subscriptions with DTO out
+    @GetMapping("/get/dto")
+    public ResponseEntity<?> getAllSubscriptionsDTOOut() {
+        return ResponseEntity.status(200).body(subscriptionService.getAllSubscriptionDTOOut());
+    }
+
+    @GetMapping("/get/{userId}/dto")
+    public ResponseEntity<?> getSubscriptionDtoByUserId(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(subscriptionService.getAllSubscriptionDTOOutByUserId(userId));
+    }
 
     // Get all subscriptions for a specific user
     @GetMapping("/get/{userId}")
@@ -80,5 +90,7 @@ public class SubscriptionController {
     public ResponseEntity<?> getExpiredByUser(@PathVariable Integer userId){
         return ResponseEntity.status(200).body(subscriptionService.getExpiredByUser(userId));
     }
+
+
 
 }

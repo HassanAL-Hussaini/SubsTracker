@@ -21,6 +21,16 @@ public class UserController {
         return ResponseEntity.status(200).body(userService.getAllUsers());
     }
 
+    @GetMapping("/get/dto")
+    public ResponseEntity<?> getAllUsersDTOOut() {
+        return ResponseEntity.status(200).body(userService.getAllUsersDTOOut());
+    }
+
+    @GetMapping("/get/{userId}/dto")
+    public ResponseEntity<?> getUserDtoByUserId(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(userService.getUserDTOOut(userId));
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> addUser(@Valid @RequestBody User user){
         userService.addUser(user);
