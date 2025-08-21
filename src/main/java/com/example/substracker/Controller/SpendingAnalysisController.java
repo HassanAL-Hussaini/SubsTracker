@@ -8,4 +8,5 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RequestMapping("/api/v1/spending_analysis")
 public class SpendingAnalysisController {
+//    public
 }
