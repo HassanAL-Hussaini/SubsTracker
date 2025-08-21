@@ -26,7 +26,6 @@ public class PaymentRequest {
     private String currency;
     private String description;
     private String callbackUrl;
-
     //this attribute where user cant edit it .
     @JsonIgnore
     private String paymentUserId;
