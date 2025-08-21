@@ -13,31 +13,31 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/payment")
 @RequiredArgsConstructor
 public class PaymentController {
- private final PaymentService paymentService;
+    private final PaymentService paymentService;
 
- @PostMapping("/process-payment/{userId}")
- //this send only the user.
- public ResponseEntity<?>
+    @PostMapping("/process-payment/{userId}")
+    //this send only the user.
+    public ResponseEntity<?>
     processPayment(@PathVariable Integer userId){
 
-     return ResponseEntity.status(200).body(paymentService.processPayment(userId));
- }
+        return ResponseEntity.status(200).body(paymentService.processPayment(userId));
+    }
 
- @PutMapping("/check-payment/{userId}")
- public ResponseEntity<?> checkPayment(@PathVariable Integer userId){
-     return ResponseEntity.status(200).body(paymentService.checkPayment(userId));
- }
- @GetMapping("/get-card/{userId}")
- public ResponseEntity<?> getPaymentCardByUserId(@PathVariable Integer userId){
-     return ResponseEntity
-             .status(200)
-             .body(paymentService.getPaymentCardByUserId(userId));
- }
- @PostMapping("/add-card/{userId}")
- public ResponseEntity<?> addPaymentCard(@PathVariable Integer userId ,@RequestBody @Valid PaymentRequest paymentCard){
-     paymentService.addPaymentCard(userId,paymentCard);
-     return ResponseEntity
-             .status(200)
-             .body(new ApiResponse("card Added successfully"));
- }
+    @PutMapping("/check-payment/{userId}")
+    public ResponseEntity<?> checkPayment(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(paymentService.checkPayment(userId));
+    }
+    @GetMapping("/get-card/{userId}")
+    public ResponseEntity<?> getPaymentCardByUserId(@PathVariable Integer userId){
+        return ResponseEntity
+                .status(200)
+                .body(paymentService.getPaymentCardByUserId(userId));
+    }
+    @PostMapping("/add-card/{userId}")
+    public ResponseEntity<?> addPaymentCard(@PathVariable Integer userId ,@RequestBody @Valid PaymentRequest paymentCard){
+        paymentService.addPaymentCard(userId,paymentCard);
+        return ResponseEntity
+                .status(200)
+                .body(new ApiResponse("card Added successfully"));
+    }
 }
