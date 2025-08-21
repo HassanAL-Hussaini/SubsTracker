@@ -13,14 +13,14 @@ import com.example.substracker.Repository.SpendingAnalysisRepository;
 import com.example.substracker.Repository.SubscriptionRepository;
 import com.example.substracker.Repository.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final SubscriptionService subscriptionService;
@@ -191,5 +191,4 @@ public class UserService {
         userRepository.save(user);
         return user;
     }
-
 }
