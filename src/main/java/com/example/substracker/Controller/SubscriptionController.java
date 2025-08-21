@@ -5,8 +5,11 @@ import com.example.substracker.Model.Subscription;
 import com.example.substracker.Service.SubscriptionService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @AllArgsConstructor
@@ -49,4 +52,26 @@ public class SubscriptionController {
         subscriptionService.deleteSubscription(userId , subscriptionDeletedId);
         return ResponseEntity.status(200).body(new ApiResponse("Subscription deleted successfully"));
     }
+    //Mshari
+
+    @GetMapping("/user/{userId}/upcoming")
+    public ResponseEntity<?> getUpcomingByUser(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(subscriptionService.getUpcomingForUser(userId));
+    }
+    //Mshari
+    @GetMapping("/user/{userId}/day/{days}")
+    public ResponseEntity<?> getDueWithinDays(@PathVariable Integer userId,@PathVariable int days){
+        return ResponseEntity.status(200).body(subscriptionService.getDueWithinDays(userId, days));
+    }
+    //Mshari
+    @GetMapping("/user/{userId}/active/{date}")
+    public ResponseEntity<?> getActiveSubscriptionsFromDate(@PathVariable Integer userId, @PathVariable LocalDate date){
+        return ResponseEntity.status(200).body(subscriptionService.getActiveSubscriptionsFromDate(userId, date));
+    }
+    //Mshari
+    @GetMapping("/user/{userId}/expired")
+    public ResponseEntity<?> getExpiredByUser(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(subscriptionService.getExpiredByUser(userId));
+    }
+
 }

@@ -18,6 +18,6 @@ public class SpendingAnalysis {
     @PostMapping("/analyze/{userId}")
     public ResponseEntity<?> analyzeSpending(@PathVariable Integer userId) {
         return ResponseEntity.status(200)
-                .body(spendingAnalysisService.getSpendingAnalysis(userId));
+                .body(spendingAnalysisService.getSpendingAnalysisByUserId(userId));
     }
 }

@@ -24,7 +24,7 @@ public class UserService {
     }
 
     public void deleteUser(Integer userId){
-        User userDeleted = userRepository.findUserById(userId);
+        User userDeleted = userRepository.getUserById(userId);
         if(userDeleted == null){
             throw new ApiException("user Not found");
         }
@@ -32,7 +32,7 @@ public class UserService {
     }
 
     public void updateUser(Integer userId , User user){
-        User oldUser = userRepository.findUserById(userId);
+        User oldUser = userRepository.getUserById(userId);
         if(oldUser == null){
             throw new ApiException("user not found");
         }

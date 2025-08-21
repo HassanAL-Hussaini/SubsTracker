@@ -9,6 +9,7 @@ import com.example.substracker.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +29,7 @@ public class SubscriptionService {
 
     //all subscriptions for specific user
     public Set<Subscription> getAllSubscriptionByUserId(Integer userId){
-        User user = userRepository.findUserById(userId);
+        User user = userRepository.getUserById(userId);
         if(user == null){
             throw new ApiException("User not found");
         }
@@ -38,7 +39,7 @@ public class SubscriptionService {
     //create new Subscription
     public void addSubscription(Integer userId, Subscription subscription){
 
-        User user = userRepository.findUserById(userId);
+        User user = userRepository.getUserById(userId);
         if(user == null){
             throw new ApiException("User not found");
         }
@@ -61,7 +62,7 @@ public class SubscriptionService {
     }
 
     public void updateSubscription(Integer userId,Integer SubscriptionId,Subscription subscription){
-        User user = userRepository.findUserById(userId);
+        User user = userRepository.getUserById(userId);
         if(user == null){
             throw new ApiException("User not found");
         }
@@ -94,7 +95,7 @@ public class SubscriptionService {
     }
 
     public void deleteSubscription (Integer userId,Integer subscriptionDeletedId){
-        User user = userRepository.findUserById(userId);
+        User user = userRepository.getUserById(userId);
         if(user == null){
             throw new ApiException("User not found");
         }
@@ -111,5 +112,33 @@ public class SubscriptionService {
         user.getSubscriptions().remove(deletedSubscription);
         subscriptionRepository.delete(deletedSubscription);
         spendingAnalysisService.createOrUpdateSpendingAnalysis(userId);
+    }
+
+    //Mshari
+    public List<Subscription> getUpcomingForUser(Integer userId){
+        List<Subscription> subscriptions = subscriptionRepository.findByUser_IdAndStatusAndNextBillingDateGreaterThanEqualOrderByNextBillingDateAsc
+                (userId,"Active",LocalDate.now());
+        return subscriptions;
+    }
+
+    //Mshari
+    public List<Subscription> getDueWithinDays(Integer userId,int days){
+        if (days < 1 ){
+            throw new ApiException("days must be more 1day");
+        }
+        LocalDate today = LocalDate.now();
+        LocalDate to = today.plusDays(days);
+        return subscriptionRepository.findByUser_IdAndStatusAndNextBillingDateBetweenOrderByNextBillingDateAsc
+                (userId,"Active",today,to);
+    }
+
+    //Mshari
+    public List<Subscription> getActiveSubscriptionsFromDate(Integer userId,LocalDate nextBillingDate){
+        return subscriptionRepository.findByUser_IdAndStatusAndNextBillingDateGreaterThanEqualOrderByNextBillingDateAsc
+                (userId,"Active",nextBillingDate);
+    }
+    //Mshari
+    public List<Subscription> getExpiredByUser(Integer userId){
+        return subscriptionRepository.findSubscriptionByUserIdAndStatus(userId,"Expired");
     }
 }

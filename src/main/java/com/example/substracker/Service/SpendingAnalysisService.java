@@ -30,7 +30,7 @@ public class SpendingAnalysisService {
 //    }
 
     public SpendingAnalysis getSpendingAnalysisByUserId(Integer userId){
-        User user = userRepository.findUserById(userId);
+        User user = userRepository.getUserById(userId);
         if(user == null){
             throw new ApiException("User not found");
         }
@@ -42,7 +42,7 @@ public class SpendingAnalysisService {
 
 
     public void createOrUpdateSpendingAnalysis(Integer userId){
-        User user = userRepository.findUserById(userId);
+        User user = userRepository.getUserById(userId);
         Set<Subscription> subscriptions = user.getSubscriptions();
         SpendingAnalysis spendingAnalysis = user.getSpendingAnalysis();
         if(user == null){

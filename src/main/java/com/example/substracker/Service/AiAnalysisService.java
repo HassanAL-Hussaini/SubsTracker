@@ -21,7 +21,7 @@ public class AiAnalysisService {
     //create update delete To spending Analysis will affect the AI Analysis directly.
     public void addOrUpdateRecommendation(Integer userId,Integer spendingAnalysisId){
 
-        User user = userRepository.findUserById(userId);
+        User user = userRepository.getUserById(userId);
         SpendingAnalysis spendingAnalysis = spendingAnalysisRepository.findSpendingAnalysisById(spendingAnalysisId);
         if(spendingAnalysis == null){
             throw new RuntimeException("spending AnalysisId not found");
@@ -67,7 +67,7 @@ public class AiAnalysisService {
     }
 
     public AiAnalysis getAiAnalysisByUserId(Integer userId){
-        User user = userRepository.findUserById(userId);
+        User user = userRepository.getUserById(userId);
         if(user == null){
             throw new RuntimeException("User not found");
         }
