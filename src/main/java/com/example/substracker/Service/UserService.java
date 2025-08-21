@@ -1,19 +1,26 @@
 package com.example.substracker.Service;
 
 import com.example.substracker.API.ApiException;
+import com.example.substracker.DTO.AiAnalysisDTOOut;
+import com.example.substracker.DTO.SpendingAnalysisDTOOut;
+import com.example.substracker.DTO.SubscriptionDTOOut;
+import com.example.substracker.DTO.UserDTOOut;
+import com.example.substracker.Model.AiAnalysis;
+import com.example.substracker.Model.SpendingAnalysis;
+import com.example.substracker.Model.Subscription;
 import com.example.substracker.Model.User;
 import com.example.substracker.Repository.SpendingAnalysisRepository;
 import com.example.substracker.Repository.SubscriptionRepository;
 import com.example.substracker.Repository.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final SubscriptionService subscriptionService;
@@ -160,7 +167,7 @@ public class UserService {
         userRepository.delete(userDeleted);
     }
 
-    public void updateUser(Integer userId , User user){
+    public void updateUser(Integer userId, User user){
         User oldUser = userRepository.findUserById(userId);
         if(oldUser == null){
             throw new ApiException("user not found");
@@ -173,8 +180,6 @@ public class UserService {
         userRepository.save(oldUser);
     }
 
-
-}
     //Mshari
     public User triggerNotifications(Integer userId){
         User user = userRepository.findUserById(userId);
@@ -186,5 +191,4 @@ public class UserService {
         userRepository.save(user);
         return user;
     }
-
 }
