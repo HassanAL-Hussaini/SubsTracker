@@ -21,6 +21,16 @@ public class UserController {
         return ResponseEntity.status(200).body(userService.getAllUsers());
     }
 
+    @GetMapping("/get/dto")
+    public ResponseEntity<?> getAllUsersDTOOut() {
+        return ResponseEntity.status(200).body(userService.getAllUsersDTOOut());
+    }
+
+    @GetMapping("/get/{userId}/dto")
+    public ResponseEntity<?> getUserDtoByUserId(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(userService.getUserDTOOut(userId));
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> addUser(@Valid @RequestBody User user){
         userService.addUser(user);
@@ -37,5 +47,10 @@ public class UserController {
     public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
         userService.deleteUser(id);
         return ResponseEntity.status(200).body(new ApiResponse("User deleted successfully"));
+    }
+    //Mshari
+    @PutMapping("/{userId}/notifications/trigger")
+    public ResponseEntity<?> trigger(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body( userService.triggerNotifications(userId));
     }
 }

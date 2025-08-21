@@ -14,18 +14,9 @@ public class ExpirationAlertController {
     private final ExpirationAlertService expirationAlertService;
 
     /**
-     * Trigger expiration alert check manually
-     */
-    //for testing purposes, to manually trigger the expiration alert check
-    @GetMapping("/check")
-    public ResponseEntity<?> triggerExpirationCheck() {
-        expirationAlertService.checkAndSendExpirationAlerts();
-        return ResponseEntity.status(200).body(new ApiResponse("Expiration alert check triggered successfully"));
-    }
-
-    /**
      * Trigger manual alert for specific subscription
      */
+    //made by mohammed
     //for testing purposes, to manually send an alert for a specific subscription
     @PostMapping("/send/{subscriptionId}/{alertType}")
     public ResponseEntity<?> sendManualAlert(

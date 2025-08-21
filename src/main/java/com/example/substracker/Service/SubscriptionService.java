@@ -1,5 +1,6 @@
 package com.example.substracker.Service;
 import com.example.substracker.API.ApiException;
+import com.example.substracker.DTO.SubscriptionDTOOut;
 import com.example.substracker.Model.SpendingAnalysis;
 import com.example.substracker.Model.Subscription;
 import com.example.substracker.Model.User;
@@ -7,11 +8,11 @@ import com.example.substracker.Repository.SpendingAnalysisRepository;
 import com.example.substracker.Repository.SubscriptionRepository;
 import com.example.substracker.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,25 @@ public class SubscriptionService {
         return subscriptionRepository.findAll();
     }
 
+    //get DTO out for all subscriptions
+    public List<SubscriptionDTOOut> getAllSubscriptionDTOOut(){
+        ArrayList<SubscriptionDTOOut> subscriptionDTOOuts = new ArrayList<>();
+        for(Subscription subscription : getAllSubscription()) {
+            SubscriptionDTOOut subscriptionDTOOut = new SubscriptionDTOOut(
+                    subscription.getSubscriptionName(),
+                    subscription.getCategory(),
+                    subscription.getPrice(),
+                    subscription.getBillingPeriod(),
+                    subscription.getNextBillingDate(),
+                    subscription.getStatus(),
+                    subscription.getUrl(),
+                    subscription.getDescription()
+            );
+            subscriptionDTOOuts.add(subscriptionDTOOut);
+        }
+        return subscriptionDTOOuts;
+    }
+
     //all subscriptions for specific user
     public Set<Subscription> getAllSubscriptionByUserId(Integer userId){
         User user = userRepository.findUserById(userId);
@@ -33,6 +53,57 @@ public class SubscriptionService {
             throw new ApiException("User not found");
         }
         return user.getSubscriptions();
+    }
+
+    //get all subscriptions for specific user as DTO
+    public List<SubscriptionDTOOut> getAllSubscriptionDTOOutByUserId(Integer userId){
+        User user = userRepository.findUserById(userId);
+        if(user == null){
+            throw new ApiException("User not found");
+        }
+
+        List<SubscriptionDTOOut> subscriptionDTOOuts = new ArrayList<>();
+        Set<Subscription> userSubscriptions = user.getSubscriptions();
+
+        if(userSubscriptions != null) {
+            for(Subscription subscription : userSubscriptions) {
+                SubscriptionDTOOut subscriptionDTOOut = new SubscriptionDTOOut(
+                        subscription.getSubscriptionName(),
+                        subscription.getCategory(),
+                        subscription.getPrice(),
+                        subscription.getBillingPeriod(),
+                        subscription.getNextBillingDate(),
+                        subscription.getStatus(),
+                        subscription.getUrl(),
+                        subscription.getDescription()
+                );
+                subscriptionDTOOuts.add(subscriptionDTOOut);
+            }
+        }
+        return subscriptionDTOOuts;
+    }
+
+    // Utility method to convert subscription to DTO
+    private SubscriptionDTOOut convertToDTO(Subscription subscription) {
+        return new SubscriptionDTOOut(
+                subscription.getSubscriptionName(),
+                subscription.getCategory(),
+                subscription.getPrice(),
+                subscription.getBillingPeriod(),
+                subscription.getNextBillingDate(),
+                subscription.getStatus(),
+                subscription.getUrl(),
+                subscription.getDescription()
+        );
+    }
+
+    // Utility method to convert list of subscriptions to DTOs
+    private List<SubscriptionDTOOut> convertListToDTO(List<Subscription> subscriptions) {
+        List<SubscriptionDTOOut> dtoList = new ArrayList<>();
+        for(Subscription subscription : subscriptions) {
+            dtoList.add(convertToDTO(subscription));
+        }
+        return dtoList;
     }
 
     //create new Subscription
@@ -48,6 +119,16 @@ public class SubscriptionService {
         }
         subscription.setUser(user);
         user.getSubscriptions().add(subscription);
+        if(Objects.equals(subscription.getBillingPeriod(), "monthly")){
+            subscription.setNextBillingDate(java.time.LocalDate.now().plusMonths(1));
+        } else if(Objects.equals(subscription.getBillingPeriod(), "3month")){
+            subscription.setNextBillingDate(java.time.LocalDate.now().plusMonths(3));
+        } else if(Objects.equals(subscription.getBillingPeriod(), "6month")){
+            subscription.setNextBillingDate(java.time.LocalDate.now().plusMonths(6));
+        } else if(Objects.equals(subscription.getBillingPeriod(), "yearly")){
+            subscription.setNextBillingDate(java.time.LocalDate.now().plusYears(1));
+        }
+        subscription.setStatus("Active");
         subscriptionRepository.save(subscription);
         //creating Spending Analysis:
         //First time >> Spending analysis creation
@@ -111,5 +192,95 @@ public class SubscriptionService {
         user.getSubscriptions().remove(deletedSubscription);
         subscriptionRepository.delete(deletedSubscription);
         spendingAnalysisService.createOrUpdateSpendingAnalysis(userId);
+    }
+
+    @Scheduled(cron = "0 * * * * *")
+    public void checkStatusSubscriptionExpired() {
+        List<Subscription> subscriptions = subscriptionRepository.findAll();
+        for (Subscription subscription : subscriptions) {
+            if (subscription.getNextBillingDate() == null) {
+                continue; // Skip if next billing date is not set
+            }
+            if (!subscription.getNextBillingDate().isAfter(java.time.LocalDate.now())) {
+                subscription.setStatus("Expired");
+                subscriptionRepository.save(subscription);
+            }
+        }
+    }
+
+    public void renewSubscription(Integer userId, Integer subscriptionId,String billingPeriod) {
+        User user = userRepository.findUserById(userId);
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+        Set<Subscription> subscriptions = user.getSubscriptions();
+        Subscription subscriptionToRenew = null;
+        for (Subscription sub : subscriptions) {
+            if (sub.getId().equals(subscriptionId) && sub.getStatus().equals("Expired")) {
+                subscriptionToRenew = sub;
+            }
+        }
+        if (subscriptionToRenew == null) {
+            throw new ApiException("Subscription not found");
+        }
+
+        subscriptionToRenew.setBillingPeriod(billingPeriod);
+        if (Objects.equals(billingPeriod, "monthly")) {
+            subscriptionToRenew.setNextBillingDate(java.time.LocalDate.now().plusMonths(1));
+        } else if (Objects.equals(billingPeriod, "3month")) {
+            subscriptionToRenew.setNextBillingDate(java.time.LocalDate.now().plusMonths(3));
+        } else if (Objects.equals(billingPeriod, "6month")) {
+            subscriptionToRenew.setNextBillingDate(java.time.LocalDate.now().plusMonths(6));
+        } else if (Objects.equals(billingPeriod, "yearly")) {
+            subscriptionToRenew.setNextBillingDate(java.time.LocalDate.now().plusYears(1));
+        }
+        subscriptionToRenew.setStatus("Active");
+        subscriptionRepository.save(subscriptionToRenew);
+    }
+
+    //Mshari - Entity methods
+    public List<Subscription> getUpcomingForUser(Integer userId){
+        List<Subscription> subscriptions = subscriptionRepository.findByUser_IdAndStatusAndNextBillingDateGreaterThanEqualOrderByNextBillingDateAsc
+                (userId,"Active",LocalDate.now());
+        return subscriptions;
+    }
+
+    public List<Subscription> getDueWithinDays(Integer userId,int days){
+        if (days < 1 ){
+            throw new ApiException("days must be more 1day");
+        }
+        LocalDate today = LocalDate.now();
+        LocalDate to = today.plusDays(days);
+        return subscriptionRepository.findByUser_IdAndStatusAndNextBillingDateBetweenOrderByNextBillingDateAsc
+                (userId,"Active",today,to);
+    }
+
+    public List<Subscription> getActiveSubscriptions(Integer userId){
+        return subscriptionRepository.findSubscriptionByUserIdAndStatus(userId,"Active");
+    }
+
+    public List<Subscription> getExpiredByUser(Integer userId){
+        return subscriptionRepository.findSubscriptionByUserIdAndStatus(userId,"Expired");
+    }
+
+    //Mshari - DTO methods
+    public List<SubscriptionDTOOut> getUpcomingForUserDTOOut(Integer userId){
+        List<Subscription> subscriptions = getUpcomingForUser(userId);
+        return convertListToDTO(subscriptions);
+    }
+
+    public List<SubscriptionDTOOut> getDueWithinDaysDTOOut(Integer userId, int days){
+        List<Subscription> subscriptions = getDueWithinDays(userId, days);
+        return convertListToDTO(subscriptions);
+    }
+
+    public List<SubscriptionDTOOut> getActiveSubscriptionsDTOOut(Integer userId){
+        List<Subscription> subscriptions = getActiveSubscriptions(userId);
+        return convertListToDTO(subscriptions);
+    }
+
+    public List<SubscriptionDTOOut> getExpiredByUserDTOOut(Integer userId){
+        List<Subscription> subscriptions = getExpiredByUser(userId);
+        return convertListToDTO(subscriptions);
     }
 }

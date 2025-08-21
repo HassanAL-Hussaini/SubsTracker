@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface SpendingAnalysisRepository extends JpaRepository<SpendingAnalysis,Integer> {
     SpendingAnalysis findSpendingAnalysisById(Integer id);
 
+    SpendingAnalysis findSpendingANalysisByUserId(Integer userId);
+
 }

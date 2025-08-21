@@ -46,6 +46,10 @@ public class ExpirationAlert {
     @Column(columnDefinition = "varchar(255) not null")
     private String message;
 
+    @NotNull(message = "is sent cannot be null")
+    @Column(columnDefinition = "boolean not null default false")
+    private Boolean isSent = false;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
     //Nothing

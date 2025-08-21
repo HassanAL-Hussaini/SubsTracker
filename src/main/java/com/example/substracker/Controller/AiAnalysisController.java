@@ -18,11 +18,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 public class AiAnalysisController {
     private final AiAnalysisService aiAnalysisService;
+    //Made by Hassan
     @GetMapping("/get_ai_analysis_by_user_id/{userId}")
-    public ResponseEntity<?> getAiAnalysisByUserId(@PathVariable @Valid Integer userId){
+    public ResponseEntity<?> getAiAnalysisByUserId(@PathVariable Integer userId){
         return ResponseEntity
                 .status(200)
                 .body(aiAnalysisService.getAiAnalysisByUserId(userId));
+    }
+
+    @GetMapping("/get/user/{userId}/dto")
+    public ResponseEntity<?> getAiAnalysisDTOByUserId(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(aiAnalysisService.getAiAnalysisDTOOutByUserId(userId));
     }
 
 }

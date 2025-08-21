@@ -1,6 +1,8 @@
 package com.example.substracker.Service;
 
 import com.example.substracker.API.ApiException;
+import com.example.substracker.DTO.AiAnalysisDTOOut;
+import com.example.substracker.DTO.SpendingAnalysisDTOOut;
 import com.example.substracker.Model.AiAnalysis;
 import com.example.substracker.Model.SpendingAnalysis;
 import com.example.substracker.Model.Subscription;
@@ -11,6 +13,7 @@ import com.example.substracker.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -21,13 +24,7 @@ public class SpendingAnalysisService {
     private final UserRepository userRepository;
     private final AiAnalysisService aiAnalysisService;
 
-
     //there is No Delete in spending Analysis
-
-
-//    public List<SpendingAnalysis> getAllSpendingAnalysis(){
-//        return spendingAnalysisRepository.findAll();
-//    }
 
     public SpendingAnalysis getSpendingAnalysisByUserId(Integer userId){
         User user = userRepository.findUserById(userId);
@@ -40,19 +37,80 @@ public class SpendingAnalysisService {
         return spendingAnalysisRepository.findSpendingAnalysisById(user.getSpendingAnalysis().getId());
     }
 
+    public SpendingAnalysisDTOOut getSpendingAnalysisDTOOutByUserId(Integer userId){
+        User user = userRepository.findUserById(userId);
+        if(user == null){
+            throw new ApiException("User not found");
+        }
+        if(user.getSpendingAnalysis() == null){
+            throw new ApiException("User spending analysis not found because he have not subscriptions yet");
+        }
+
+        SpendingAnalysis spendingAnalysis = user.getSpendingAnalysis();
+
+        // Convert AiAnalysis to DTO
+        AiAnalysisDTOOut aiAnalysisDTOOut = null;
+        AiAnalysis aiAnalysis = spendingAnalysis.getAiAnalysis();
+        if(aiAnalysis != null) {
+            aiAnalysisDTOOut = new AiAnalysisDTOOut(
+                    aiAnalysis.getGeneralRecommendations()
+            );
+        }
+
+        return new SpendingAnalysisDTOOut(
+                spendingAnalysis.getDigitalSubscriptionsTotalPrice(),
+                spendingAnalysis.getServiceSubscriptionsTotalPrice(),
+                spendingAnalysis.getTotalSpendingPrice(),
+                spendingAnalysis.getAverageSubscriptionCost(),
+                spendingAnalysis.getSpendingToIncomeRatio(),
+                spendingAnalysis.getTotalSubscriptionsCount(),
+                spendingAnalysis.getDigitalSubscriptionsCount(),
+                spendingAnalysis.getServiceSubscriptionsCount(),
+                aiAnalysisDTOOut
+        );
+    }
+
+    public List<SpendingAnalysisDTOOut> getAllSpendingAnalysisDTOOut(){
+        ArrayList<SpendingAnalysisDTOOut> spendingAnalysisDTOOuts = new ArrayList<>();
+
+        for(SpendingAnalysis spendingAnalysis : spendingAnalysisRepository.findAll()) {
+            // Convert AiAnalysis to DTO
+            AiAnalysisDTOOut aiAnalysisDTOOut = null;
+            AiAnalysis aiAnalysis = spendingAnalysis.getAiAnalysis();
+            if(aiAnalysis != null) {
+                aiAnalysisDTOOut = new AiAnalysisDTOOut(
+                        aiAnalysis.getGeneralRecommendations()
+                );
+            }
+
+            SpendingAnalysisDTOOut spendingAnalysisDTOOut = new SpendingAnalysisDTOOut(
+                    spendingAnalysis.getDigitalSubscriptionsTotalPrice(),
+                    spendingAnalysis.getServiceSubscriptionsTotalPrice(),
+                    spendingAnalysis.getTotalSpendingPrice(),
+                    spendingAnalysis.getAverageSubscriptionCost(),
+                    spendingAnalysis.getSpendingToIncomeRatio(),
+                    spendingAnalysis.getTotalSubscriptionsCount(),
+                    spendingAnalysis.getDigitalSubscriptionsCount(),
+                    spendingAnalysis.getServiceSubscriptionsCount(),
+                    aiAnalysisDTOOut
+            );
+            spendingAnalysisDTOOuts.add(spendingAnalysisDTOOut);
+        }
+        return spendingAnalysisDTOOuts;
+    }
 
     public void createOrUpdateSpendingAnalysis(Integer userId){
         User user = userRepository.findUserById(userId);
-        Set<Subscription> subscriptions = user.getSubscriptions();
-        SpendingAnalysis spendingAnalysis = user.getSpendingAnalysis();
         if(user == null){
             throw new ApiException("user not found");
         }
 
+        Set<Subscription> subscriptions = user.getSubscriptions();
         if(subscriptions == null){
             throw new ApiException("subscriptions not found");
         }
 
+        SpendingAnalysis spendingAnalysis = user.getSpendingAnalysis();
         if(spendingAnalysis == null){
             throw new ApiException("spendingAnalysis not found");
         }
@@ -79,7 +137,7 @@ public class SpendingAnalysisService {
         spendingAnalysis.setTotalSubscriptionsCount(subscriptions.size());
         spendingAnalysis.setSpendingToIncomeRatio((spendingAnalysis.getTotalSpendingPrice() / user.getMonthlySalary()) * 100);
 
-        //TODO AI analysis:
+        //AI analysis:
         if(spendingAnalysis.getAiAnalysis() == null){
             AiAnalysis aiAnalysis = new AiAnalysis();
             spendingAnalysis.setAiAnalysis(aiAnalysis);
@@ -89,10 +147,4 @@ public class SpendingAnalysisService {
         spendingAnalysis.setUser(user);
         spendingAnalysisRepository.save(spendingAnalysis);
     }
-
-
-
-
-
-
 }

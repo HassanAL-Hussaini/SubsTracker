@@ -5,8 +5,11 @@ import com.example.substracker.Model.Subscription;
 import com.example.substracker.Service.SubscriptionService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @AllArgsConstructor
@@ -19,6 +22,16 @@ public class SubscriptionController {
     @GetMapping("/get")
     public ResponseEntity<?> getAllSubscriptions() {
         return ResponseEntity.status(200).body(subscriptionService.getAllSubscription());
+    }
+    // Get all subscriptions with DTO out
+    @GetMapping("/get/dto")
+    public ResponseEntity<?> getAllSubscriptionsDTOOut() {
+        return ResponseEntity.status(200).body(subscriptionService.getAllSubscriptionDTOOut());
+    }
+
+    @GetMapping("/get/{userId}/dto")
+    public ResponseEntity<?> getSubscriptionDtoByUserId(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(subscriptionService.getAllSubscriptionDTOOutByUserId(userId));
     }
 
     // Get all subscriptions for a specific user
@@ -49,4 +62,35 @@ public class SubscriptionController {
         subscriptionService.deleteSubscription(userId , subscriptionDeletedId);
         return ResponseEntity.status(200).body(new ApiResponse("Subscription deleted successfully"));
     }
+
+    // Renew subscription
+    @PutMapping("/renew/{userId}/{subscriptionId}/{billingPeriod}")
+    public ResponseEntity<?> renewSubscription(@PathVariable Integer userId, @PathVariable Integer subscriptionId, @PathVariable String billingPeriod) {
+        subscriptionService.renewSubscription(userId, subscriptionId, billingPeriod);
+        return ResponseEntity.status(200).body(new ApiResponse("Subscription renewed successfully"));
+    }
+    //Mshari
+
+    @GetMapping("/user/{userId}/upcoming")
+    public ResponseEntity<?> getUpcomingByUser(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(subscriptionService.getUpcomingForUser(userId));
+    }
+    //Mshari
+    @GetMapping("/user/{userId}/day/{days}")
+    public ResponseEntity<?> getDueWithinDays(@PathVariable Integer userId,@PathVariable int days){
+        return ResponseEntity.status(200).body(subscriptionService.getDueWithinDays(userId, days));
+    }
+    //Mshari
+    @GetMapping("/user/{userId}/active")
+    public ResponseEntity<?> getActiveSubscriptionsFromDate(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(subscriptionService.getActiveSubscriptions(userId));
+    }
+    //Mshari
+    @GetMapping("/user/{userId}/expired")
+    public ResponseEntity<?> getExpiredByUser(@PathVariable Integer userId){
+        return ResponseEntity.status(200).body(subscriptionService.getExpiredByUser(userId));
+    }
+
+
+
 }

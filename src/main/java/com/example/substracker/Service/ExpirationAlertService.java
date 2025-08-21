@@ -41,11 +41,16 @@ public class ExpirationAlertService {
                     subscription.getSubscriptionName(),
                     subscription.getNextBillingDate().toString(),
                     alert.getDaysBeforeExpiry(),
-                    subscription.getPrice()
+                    subscription.getPrice(),
+                    subscription.getUrl() // Add the subscription URL
             );
 
             notificationService.sendHtmlEmail(user.getEmail(), subject, htmlBody);
             System.out.println("Expiration alert sent to: " + user.getEmail());
+
+            // بعد الإرسال عدّل الحالة واحفظ
+            alert.setIsSent(true);
+            expirationAlertRepository.save(alert);
 
         } catch (Exception e) {
             System.err.println("Failed to send expiration alert: " + e.getMessage());
@@ -64,6 +69,7 @@ public class ExpirationAlertService {
 
         String message = buildAlertMessage(alertType, subscription.getSubscriptionName(), daysBeforeExpiry);
         alert.setMessage(message);
+        alert.setIsSent(false); // أول ما ينشأ يكون false
 
         return expirationAlertRepository.save(alert);
     }
@@ -71,19 +77,16 @@ public class ExpirationAlertService {
     /**
      * Check subscriptions and send alerts - runs daily at 9 AM
      */
-    @Scheduled(cron = "0 0 9 * * *")
+    @Scheduled(cron = "0 * * * * *")
     public void checkAndSendExpirationAlerts() {
         System.out.println("Checking for subscription expirations...");
 
         LocalDate today = LocalDate.now();
-
-        // Get all active subscriptions
         List<Subscription> activeSubscriptions = subscriptionRepository.findByStatus("Active");
 
         for (Subscription subscription : activeSubscriptions) {
             User user = subscription.getUser();
 
-            // Skip if notifications disabled
             if (user == null || !Boolean.TRUE.equals(user.getEmailNotificationsEnabled())) {
                 continue;
             }
@@ -91,19 +94,21 @@ public class ExpirationAlertService {
             LocalDate nextBillingDate = subscription.getNextBillingDate();
             int daysDiff = (int) java.time.temporal.ChronoUnit.DAYS.between(today, nextBillingDate);
 
-            if (daysDiff == 7) {
-                ExpirationAlert alert = createExpirationAlert(subscription, "normal", 7);
-                sendExpirationAlert(alert);
-            } else if (daysDiff == 2) {
-                ExpirationAlert alert = createExpirationAlert(subscription, "urgent", 2);
-                sendExpirationAlert(alert);
+            if (daysDiff == 7 || daysDiff == 2) {
+                String alertType = (daysDiff == 7) ? "normal" : "urgent";
+
+                boolean alreadySent = expirationAlertRepository
+                        .existsBySubscriptionAndAlertTypeAndIsSent(subscription, alertType, true);
+
+                if (!alreadySent) {
+                    ExpirationAlert alert = createExpirationAlert(subscription, alertType, daysDiff);
+                    sendExpirationAlert(alert);
+                }
             }
         }
 
         System.out.println("Expiration check completed.");
     }
-
-
 
     /**
      * Manual trigger for sending alerts for a specific subscription
@@ -113,12 +118,15 @@ public class ExpirationAlertService {
                 .orElseThrow(() -> new RuntimeException("Subscription not found"));
 
         int daysBeforeExpiry = alertType.equals("urgent") ? 2 : 7;
-        ExpirationAlert alert = createExpirationAlert(subscription, alertType, daysBeforeExpiry);
-        sendExpirationAlert(alert);
+
+        boolean alreadySent = expirationAlertRepository
+                .existsBySubscriptionAndAlertTypeAndIsSent(subscription, alertType, true);
+
+        if (!alreadySent) {
+            ExpirationAlert alert = createExpirationAlert(subscription, alertType, daysBeforeExpiry);
+            sendExpirationAlert(alert);
+        }
     }
-
-
-
 
     /**
      * Build email subject based on alert type
@@ -143,11 +151,16 @@ public class ExpirationAlertService {
      * Build HTML email template for expiration alerts
      */
     private String buildExpirationEmailHtml(String alertType, String userName, String subscriptionName,
-                                            String expirationDate, int daysBeforeExpiry, Double price) {
+                                            String expirationDate, int daysBeforeExpiry, Double price, String renewUrl) {
 
-        String urgentClass = "urgent".equals(alertType) ? "urgent" : "";
         String icon = "urgent".equals(alertType) ? "🚨" : "⏰";
         String alertTitle = "urgent".equals(alertType) ? "URGENT EXPIRATION ALERT" : "SUBSCRIPTION REMINDER";
+
+        // Ensure the URL has a protocol if it doesn't already have one
+        String finalRenewUrl = renewUrl;
+        if (renewUrl != null && !renewUrl.isEmpty() && !renewUrl.startsWith("http://") && !renewUrl.startsWith("https://")) {
+            finalRenewUrl = "https://" + renewUrl;
+        }
 
         return String.format("""
             <!doctype html>
@@ -185,7 +198,7 @@ public class ExpirationAlertService {
                             To avoid service interruption, please renew your subscription before the expiration date.
                           </p>
                           <p style="margin:0 0 24px 0;">
-                            <a href="#" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;">
+                            <a href="%s" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;" target="_blank">
                               Renew Subscription
                             </a>
                           </p>
@@ -206,17 +219,18 @@ public class ExpirationAlertService {
             </body>
             </html>
             """,
-                "urgent".equals(alertType) ? "#dc2626" : "#2563eb", // Background color
+                "urgent".equals(alertType) ? "#dc2626" : "#2563eb",
                 icon,
                 alertTitle,
                 userName,
                 subscriptionName,
                 daysBeforeExpiry,
                 expirationDate,
-                "urgent".equals(alertType) ? "#dc2626" : "#2563eb", // Border color
+                "urgent".equals(alertType) ? "#dc2626" : "#2563eb",
                 subscriptionName,
                 price,
                 expirationDate,
+                finalRenewUrl != null && !finalRenewUrl.isEmpty() ? finalRenewUrl : "#",
                 java.time.Year.now().getValue()
         );
     }
