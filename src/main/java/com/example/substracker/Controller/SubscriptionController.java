@@ -73,24 +73,52 @@ public class SubscriptionController {
 
     @GetMapping("/user/{userId}/upcoming")
     public ResponseEntity<?> getUpcomingByUser(@PathVariable Integer userId){
-        return ResponseEntity.status(200).body(subscriptionService.getUpcomingForUser(userId));
+        return ResponseEntity.status(200).body(subscriptionService.getUpcomingForUserDTOOut(userId));
     }
     //Mshari
     @GetMapping("/user/{userId}/day/{days}")
     public ResponseEntity<?> getDueWithinDays(@PathVariable Integer userId,@PathVariable int days){
-        return ResponseEntity.status(200).body(subscriptionService.getDueWithinDays(userId, days));
+        return ResponseEntity.status(200).body(subscriptionService.getDueWithinDaysDTOOut(userId, days));
     }
     //Mshari
     @GetMapping("/user/{userId}/active")
     public ResponseEntity<?> getActiveSubscriptionsFromDate(@PathVariable Integer userId){
-        return ResponseEntity.status(200).body(subscriptionService.getActiveSubscriptions(userId));
+        return ResponseEntity.status(200).body(subscriptionService.getActiveSubscriptionsDTOOut(userId));
     }
     //Mshari
     @GetMapping("/user/{userId}/expired")
     public ResponseEntity<?> getExpiredByUser(@PathVariable Integer userId){
-        return ResponseEntity.status(200).body(subscriptionService.getExpiredByUser(userId));
+        return ResponseEntity.status(200).body(subscriptionService.getExpiredByUserDTOOut(userId));
+    }
+
+    @GetMapping("/user/{userId}/category/{category}")
+    public ResponseEntity<?> getSubscriptionsForUserByCategory(@PathVariable Integer userId, @PathVariable String category){
+        return ResponseEntity.status(200).body(subscriptionService.getSubscriptionsForUserByCategory(userId, category));
     }
 
 
+    @GetMapping("/user/{userId}/billing/{billingPeriod}")
+    public ResponseEntity<?> getSubscriptionForUserByNextBillingDate(@PathVariable Integer userId, @PathVariable String billingPeriod){
+        return ResponseEntity.status(200).body(subscriptionService.getSubscriptionsForUserByBillingPeriod(userId, billingPeriod));
+    }
+
+    @GetMapping("/user/{userId}/price-range/{minPrice}/{maxPrice}")
+    public ResponseEntity<?> getSubscriptionsForUserBetweenMinMaxPrice(@PathVariable Integer userId, @PathVariable Double minPrice, @PathVariable Double maxPrice){
+        return ResponseEntity.status(200).body(subscriptionService.getSubscriptionsForUserBetweenMinMaxPriceOrEqual(userId, minPrice, maxPrice));
+    }
+
+    @GetMapping("/user/{userId}/most-expensive")
+    public ResponseEntity<?> getMostExpensiveSubscription(@PathVariable Integer userId) {
+        return ResponseEntity
+                .status(200)
+                .body(subscriptionService.getMostExpensiveSubscription(userId));
+    }
+
+    @GetMapping("/user/{userId}/cheapest")
+    public ResponseEntity<?> getMostCheapestSubscription(@PathVariable Integer userId) {
+        return ResponseEntity
+                .status(200)
+                .body(subscriptionService.getMostCheapestSubscription(userId));
+    }
 
 }
