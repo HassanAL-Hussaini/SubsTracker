@@ -48,6 +48,7 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.status(200).body(new ApiResponse("User deleted successfully"));
     }
+
     //Mshari
     @PutMapping("/{userId}/notifications/trigger")
     public ResponseEntity<?> trigger(@PathVariable Integer userId){

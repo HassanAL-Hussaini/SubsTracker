@@ -283,4 +283,93 @@ public class SubscriptionService {
         List<Subscription> subscriptions = getExpiredByUser(userId);
         return convertListToDTO(subscriptions);
     }
+
+    public List<SubscriptionDTOOut> getSubscriptionsForUserByCategory(Integer userId, String category){
+        User user = userRepository.findUserById(userId);
+        List<Subscription> subscriptionList = new ArrayList<>();
+        if(user != null){
+            Set<Subscription> subscriptions = user.getSubscriptions();
+            if(subscriptions != null){
+                for(Subscription subscription : subscriptions){
+                    if(subscription.getCategory().equals(category)){
+                        subscriptionList.add(subscription);
+                    }
+                }
+            }else{
+                throw new ApiException("User didn't have any subscriptions");
+            }
+        }else{
+            throw new ApiException("User not found");
+        }
+        return convertListToDTO(subscriptionList);
+    }
+
+    public List<SubscriptionDTOOut> getSubscriptionsForUserByBillingPeriod(Integer userId, String billingPeriod){
+        User user = userRepository.findUserById(userId);
+        List<Subscription> subscriptionList = new ArrayList<>();
+        if(user != null){
+            Set<Subscription> subscriptions = user.getSubscriptions();
+            if(subscriptions != null){
+                for(Subscription subscription : subscriptions){
+                    if(billingPeriod.equals(subscription.getBillingPeriod())){
+                        subscriptionList.add(subscription);
+                    }
+                }
+            }else{
+                throw new ApiException("User didn't have any subscriptions");
+            }
+        }else{
+            throw new ApiException("User not found");
+        }
+        return convertListToDTO(subscriptionList);
+    }
+
+    public List<SubscriptionDTOOut> getSubscriptionsForUserBetweenMinMaxPriceOrEqual(Integer userId, Double minPrice, Double maxPrice){
+        User user = userRepository.findUserById(userId);
+        List<Subscription> subscriptionList = new ArrayList<>();
+        if(user != null){
+            Set<Subscription> subscriptions = user.getSubscriptions();
+            if(subscriptions != null){
+                for(Subscription subscription : subscriptions){
+                    if(subscription.getPrice()>=minPrice && subscription.getPrice()<=maxPrice){
+                        subscriptionList.add(subscription);
+                    }
+                }
+            }else{
+                throw new ApiException("User didn't have any subscriptions");
+            }
+        }else{
+            throw new ApiException("User not found");
+        }
+        return convertListToDTO(subscriptionList);
+    }
+
+    public SubscriptionDTOOut getMostExpensiveSubscription(Integer userId) {
+        User user = userRepository.findUserById(userId);
+        if (user == null || user.getSubscriptions() == null || user.getSubscriptions().isEmpty()) {
+            throw new ApiException("User doesn't have any subscriptions");
+        }
+
+        Subscription mostExpensive = user.getSubscriptions().stream()
+                .max(Comparator.comparingDouble(Subscription::getPrice))
+                .orElseThrow(() -> new ApiException("User doesn't have any subscriptions"));
+
+        return convertToDTO(mostExpensive);
+    }
+
+    public SubscriptionDTOOut getMostCheapestSubscription(Integer userId) {
+        User user = userRepository.findUserById(userId);
+        if (user == null || user.getSubscriptions() == null || user.getSubscriptions().isEmpty()) {
+            throw new ApiException("User doesn't have any subscriptions");
+        }
+
+        Subscription cheapest = user.getSubscriptions().stream()
+                .min(Comparator.comparingDouble(Subscription::getPrice))
+                .orElseThrow(() -> new ApiException("User doesn't have any subscriptions"));
+
+        return convertToDTO(cheapest);
+    }
+
+
+
 }
