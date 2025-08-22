@@ -191,4 +191,12 @@ public class UserService {
         userRepository.save(user);
 
     }
+
+    public List<User> getAllSubsUsers(){
+        return userRepository.findUsersByIsSubscribed(Boolean.TRUE);
+    }
+
+    public List<User> getAllUnsubsUsers(){
+        return userRepository.findUsersByIsSubscribed(Boolean.FALSE);
+    }
 }
