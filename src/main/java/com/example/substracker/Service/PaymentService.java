@@ -112,6 +112,7 @@ public class PaymentService {
     }
 
     // When paid -> email PDF receipt to the user (no controller needed)
+    // Mshari
     public String checkPayment(Integer userId) {
         User user = userRepository.findUserById(userId);
         if (user == null) {
@@ -156,6 +157,7 @@ public class PaymentService {
 
             if (paid) {
                 // 1) Build PDF receipt
+                // Mshari
                 double charged = 30.0;
                 byte[] pdf = pdfService.buildAiPurchaseReceipt(paymentId, user.getName(), user.getEmail(), charged);
 
