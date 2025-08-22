@@ -123,7 +123,7 @@ public class PaymentService {
         if (user.getPaymentRequest().getPaymentUserId() == null) {
             throw new ApiException("Pay first before Changing the status");
         }
-        if(Boolean.TRUE.equals(user.getIsSubscribed())){
+        if(user.getIsSubscribed() == true){
             throw new ApiException("you are subscriber");
         }
 
