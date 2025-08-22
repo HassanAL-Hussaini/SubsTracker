@@ -9,7 +9,6 @@ import com.example.substracker.Model.AiAnalysis;
 import com.example.substracker.Model.SpendingAnalysis;
 import com.example.substracker.Model.Subscription;
 import com.example.substracker.Model.User;
-import com.example.substracker.Repository.SpendingAnalysisRepository;
 import com.example.substracker.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
