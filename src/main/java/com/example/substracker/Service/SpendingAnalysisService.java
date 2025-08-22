@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -26,15 +27,26 @@ public class SpendingAnalysisService {
 
     //there is No Delete in spending Analysis
 
-    public SpendingAnalysis getSpendingAnalysisByUserId(Integer userId){
+    public SpendingAnalysisDTOOut getSpendingAnalysisByUserId(Integer userId){
         User user = userRepository.findUserById(userId);
-        if(user == null){
-            throw new ApiException("User not found");
-        }
-        if(user.getSpendingAnalysis() == null){
-            throw new ApiException("User spending analysis not found because he have not subscriptions yet");
-        }
-        return spendingAnalysisRepository.findSpendingAnalysisById(user.getSpendingAnalysis().getId());
+        if(user == null) throw new ApiException("User not found");
+        SpendingAnalysis sa = user.getSpendingAnalysis();
+        if(sa == null) throw new ApiException("User spending analysis not found (no subscriptions yet)");
+
+        AiAnalysis ai = sa.getAiAnalysis();
+        AiAnalysisDTOOut aiDto = (ai != null) ? new AiAnalysisDTOOut(ai.getGeneralRecommendations()) : null;
+
+        return new SpendingAnalysisDTOOut(
+                sa.getDigitalSubscriptionsTotalPrice(),
+                sa.getServiceSubscriptionsTotalPrice(),
+                sa.getTotalSpendingPrice(),
+                sa.getAverageSubscriptionCost(),
+                sa.getSpendingToIncomeRatio(),
+                sa.getTotalSubscriptionsCount(),
+                sa.getDigitalSubscriptionsCount(),
+                sa.getServiceSubscriptionsCount(),
+                aiDto
+        );
     }
 
     public SpendingAnalysisDTOOut getSpendingAnalysisDTOOutByUserId(Integer userId){
@@ -106,8 +118,18 @@ public class SpendingAnalysisService {
         }
 
         Set<Subscription> subscriptions = user.getSubscriptions();
-        if(subscriptions == null){
-            throw new ApiException("subscriptions not found");
+        if(subscriptions == null || subscriptions.isEmpty()){
+            throw new  ApiException("User does not have subscriptions yet");
+        }
+
+        Set<Subscription> activeSubscriptions = new HashSet<>();
+        for(Subscription subscription : subscriptions){
+            if(subscription.getStatus().equals("Active"))
+                activeSubscriptions.add(subscription);
+        }
+
+        if(activeSubscriptions.isEmpty()){
+            throw new ApiException("you dont have Active subscriptions to analyse it");
         }
 
         SpendingAnalysis spendingAnalysis = user.getSpendingAnalysis();
@@ -122,7 +144,7 @@ public class SpendingAnalysisService {
         spendingAnalysis.setDigitalSubscriptionsCount(0);
         spendingAnalysis.setServiceSubscriptionsCount(0);
 
-        for(Subscription subscription : subscriptions){
+        for(Subscription subscription : activeSubscriptions){
             if(subscription.getCategory().equals("Digital")){
                 spendingAnalysis.setDigitalSubscriptionsTotalPrice(spendingAnalysis.getDigitalSubscriptionsTotalPrice() + subscription.getPrice());
                 spendingAnalysis.setDigitalSubscriptionsCount(spendingAnalysis.getDigitalSubscriptionsCount() + 1);
@@ -133,8 +155,8 @@ public class SpendingAnalysisService {
             spendingAnalysis.setTotalSpendingPrice(spendingAnalysis.getTotalSpendingPrice() + subscription.getPrice());
         }
 
-        spendingAnalysis.setAverageSubscriptionCost(spendingAnalysis.getTotalSpendingPrice() / subscriptions.size());
-        spendingAnalysis.setTotalSubscriptionsCount(subscriptions.size());
+        spendingAnalysis.setAverageSubscriptionCost(spendingAnalysis.getTotalSpendingPrice() / activeSubscriptions.size());
+        spendingAnalysis.setTotalSubscriptionsCount(activeSubscriptions.size());
         spendingAnalysis.setSpendingToIncomeRatio((spendingAnalysis.getTotalSpendingPrice() / user.getMonthlySalary()) * 100);
 
         if(user.getIsSubscribed() == true){

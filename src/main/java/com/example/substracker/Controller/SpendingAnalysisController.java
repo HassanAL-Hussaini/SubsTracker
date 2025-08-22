@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.*;
 public class SpendingAnalysisController {
     private final SpendingAnalysisService spendingAnalysisService;
 
-    @PostMapping("/analyze/{userId}")
-    public ResponseEntity<?> analyzeSpending(@PathVariable Integer userId) {
+    @GetMapping("/analyze/{userId}")
+    public ResponseEntity<?> getSpendingAnalyzerByUserId(@PathVariable Integer userId) {
         return ResponseEntity.status(200)
                 .body(spendingAnalysisService.getSpendingAnalysisByUserId(userId));
     }
+
+
 }

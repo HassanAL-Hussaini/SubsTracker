@@ -52,6 +52,7 @@ public class UserController {
     //Mshari
     @PutMapping("/{userId}/notifications/trigger")
     public ResponseEntity<?> trigger(@PathVariable Integer userId){
-        return ResponseEntity.status(200).body( userService.triggerNotifications(userId));
+        userService.triggerNotifications(userId);
+        return ResponseEntity.status(200).body(new ApiResponse("Notifications triggered successfully"));
     }
 }

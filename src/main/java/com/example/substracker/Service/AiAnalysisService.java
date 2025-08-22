@@ -90,8 +90,11 @@ public class AiAnalysisService {
         if(user.getSpendingAnalysis() == null){
             throw new ApiException("User spending analysis not found");
         }
+        if(user.getIsSubscribed() == false){
+            throw new ApiException("User is not subscribed");
+        }
         if(user.getSpendingAnalysis().getAiAnalysis() == null){
-            throw new ApiException("AI Analysis not found for this user");
+            throw new ApiException("user have not subscription ");
         }
         return user.getSpendingAnalysis().getAiAnalysis();
     }

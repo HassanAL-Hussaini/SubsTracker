@@ -53,7 +53,7 @@ public class PaymentService {
         }
 
         String url = "https://api.moyasar.com/v1/payments/";
-        String callbackUrl = "http://localhost:8080/api/v1/payment/card";
+        String callbackUrl = "http://localhost:8080/api/v1/payment/process-payment";
 
         String requestBody = String.format(
                 "source[type]=card" +
@@ -202,4 +202,6 @@ public class PaymentService {
         }
         return user.getPaymentRequest();
     }
+
+
 }
