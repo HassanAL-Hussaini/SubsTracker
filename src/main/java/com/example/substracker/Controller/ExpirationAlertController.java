@@ -16,7 +16,7 @@ public class ExpirationAlertController {
     /**
      * Trigger manual alert for specific subscription
      */
-    //made by mohammed
+    //made by Mohammed
     //for testing purposes, to manually send an alert for a specific subscription
     @PostMapping("/send/{subscriptionId}/{alertType}")
     public ResponseEntity<?> sendManualAlert(

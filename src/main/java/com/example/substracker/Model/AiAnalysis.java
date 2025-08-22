@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 public class AiAnalysis {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotEmpty(message = "general recommendations cannot be empty")

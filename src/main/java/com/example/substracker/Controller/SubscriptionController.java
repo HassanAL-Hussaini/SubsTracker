@@ -64,6 +64,7 @@ public class SubscriptionController {
     }
 
     // Renew subscription
+    //made by Mohammed
     @PutMapping("/renew/{userId}/{subscriptionId}/{billingPeriod}")
     public ResponseEntity<?> renewSubscription(@PathVariable Integer userId, @PathVariable Integer subscriptionId, @PathVariable String billingPeriod) {
         subscriptionService.renewSubscription(userId, subscriptionId, billingPeriod);
@@ -91,22 +92,26 @@ public class SubscriptionController {
         return ResponseEntity.status(200).body(subscriptionService.getExpiredByUserDTOOut(userId));
     }
 
+    //made by Mohammed
     @GetMapping("/user/{userId}/category/{category}")
     public ResponseEntity<?> getSubscriptionsForUserByCategory(@PathVariable Integer userId, @PathVariable String category){
         return ResponseEntity.status(200).body(subscriptionService.getSubscriptionsForUserByCategory(userId, category));
     }
 
 
+    //made by Mohammed
     @GetMapping("/user/{userId}/billing/{billingPeriod}")
     public ResponseEntity<?> getSubscriptionForUserByNextBillingDate(@PathVariable Integer userId, @PathVariable String billingPeriod){
         return ResponseEntity.status(200).body(subscriptionService.getSubscriptionsForUserByBillingPeriod(userId, billingPeriod));
     }
 
+    //made by Mohammed
     @GetMapping("/user/{userId}/price-range/{minPrice}/{maxPrice}")
     public ResponseEntity<?> getSubscriptionsForUserBetweenMinMaxPrice(@PathVariable Integer userId, @PathVariable Double minPrice, @PathVariable Double maxPrice){
         return ResponseEntity.status(200).body(subscriptionService.getSubscriptionsForUserBetweenMinMaxPriceOrEqual(userId, minPrice, maxPrice));
     }
 
+    //made by Mohammed
     @GetMapping("/user/{userId}/most-expensive")
     public ResponseEntity<?> getMostExpensiveSubscription(@PathVariable Integer userId) {
         return ResponseEntity
@@ -114,6 +119,7 @@ public class SubscriptionController {
                 .body(subscriptionService.getMostExpensiveSubscription(userId));
     }
 
+    //made by Mohammed
     @GetMapping("/user/{userId}/cheapest")
     public ResponseEntity<?> getMostCheapestSubscription(@PathVariable Integer userId) {
         return ResponseEntity

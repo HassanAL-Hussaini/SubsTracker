@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/user")
@@ -52,7 +54,22 @@ public class UserController {
     //Mshari
     @PutMapping("/{userId}/notifications/trigger")
     public ResponseEntity<?> trigger(@PathVariable Integer userId){
-        return ResponseEntity.status(200).body( userService.triggerNotifications(userId));
+        userService.triggerNotifications(userId);
+        return ResponseEntity.status(200).body(new ApiResponse("Notifications triggered successfully"));
+    }
+
+    // ✅ Get all subscribed users
+    @GetMapping("/get-subscribed")
+    public ResponseEntity<List<User>> getAllSubscribedUsers() {
+        List<User> subscribedUsers = userService.getAllSubsUsers();
+        return ResponseEntity.ok(subscribedUsers);
+    }
+
+    // ✅ Get all unsubscribed users
+    @GetMapping("/get-unsubscribed")
+    public ResponseEntity<List<User>> getAllUnsubscribedUsers() {
+        List<User> unsubscribedUsers = userService.getAllUnsubsUsers();
+        return ResponseEntity.ok(unsubscribedUsers);
     }
     //Mshari
     @GetMapping("/get/email/{email}")

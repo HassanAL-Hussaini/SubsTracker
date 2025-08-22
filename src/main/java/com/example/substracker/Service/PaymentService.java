@@ -53,7 +53,7 @@ public class PaymentService {
         }
 
         String url = "https://api.moyasar.com/v1/payments/";
-        String callbackUrl = "http://localhost:8081/api/v1/payment/card";
+        String callbackUrl = "http://localhost:8080/api/v1/payment/process-payment";
 
         String requestBody = String.format(
                 "source[type]=card" +
@@ -124,7 +124,7 @@ public class PaymentService {
         if (user.getPaymentRequest().getPaymentUserId() == null) {
             throw new ApiException("Pay first before Changing the status");
         }
-        if(Boolean.TRUE.equals(user.getIsSubscribed())){
+        if(user.getIsSubscribed() == true){
             throw new ApiException("you are subscriber");
         }
 
