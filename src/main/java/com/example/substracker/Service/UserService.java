@@ -191,4 +191,9 @@ public class UserService {
         userRepository.save(user);
         return user;
     }
+
+    //Mshari
+    public Boolean existsByEmail(String email){
+        return userRepository.existsByEmail(email);
+    }
 }

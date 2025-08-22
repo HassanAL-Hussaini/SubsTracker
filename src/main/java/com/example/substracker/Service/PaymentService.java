@@ -18,8 +18,8 @@ public class PaymentService {
     private final PaymentRequestRepository paymentRequestRepository;
     private final UserRepository userRepository;
 
-    private final PdfService pdfService;               // NEW
-    private final PdfMailService pdfMailService; // NEW
+    private final PdfService pdfService;
+    private final PdfMailService pdfMailService;
 
     @Value("${moyasar.api.key}")
     private String apiKey;

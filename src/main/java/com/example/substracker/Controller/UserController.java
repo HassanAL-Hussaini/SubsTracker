@@ -53,4 +53,10 @@ public class UserController {
     public ResponseEntity<?> trigger(@PathVariable Integer userId){
         return ResponseEntity.status(200).body( userService.triggerNotifications(userId));
     }
+    //Mshari
+    @GetMapping("/get/email/{email}")
+    public ResponseEntity<?> existsBeEmail(@PathVariable String email){
+        boolean exists =userService.existsByEmail(email);
+        return ResponseEntity.status(200).body(exists);
+    }
 }

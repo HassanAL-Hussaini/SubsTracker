@@ -16,6 +16,7 @@ public class PdfMailService {
     private final JavaMailSender mailSender;
 
 
+    //Mshari
     public void sendHtmlEmail(String to, String subject, String htmlBody, @Nullable String... cc) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
