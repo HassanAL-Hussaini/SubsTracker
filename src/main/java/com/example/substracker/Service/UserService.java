@@ -9,10 +9,7 @@ import com.example.substracker.Model.AiAnalysis;
 import com.example.substracker.Model.SpendingAnalysis;
 import com.example.substracker.Model.Subscription;
 import com.example.substracker.Model.User;
-import com.example.substracker.Repository.SpendingAnalysisRepository;
-import com.example.substracker.Repository.SubscriptionRepository;
 import com.example.substracker.Repository.UserRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +20,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final SubscriptionService subscriptionService;
-    private final SpendingAnalysisRepository spendingAnalysisRepository;
-    private final SpendingAnalysisService spendingAnalysisService;
 
     public List<User> getAllUsers(){
         return userRepository.findAll();
@@ -181,7 +175,7 @@ public class UserService {
     }
 
     //Mshari
-    public User triggerNotifications(Integer userId){
+    public void triggerNotifications(Integer userId){
         User user = userRepository.findUserById(userId);
         if (user == null){
             throw new ApiException("User not found");
@@ -189,6 +183,14 @@ public class UserService {
         boolean newState = !Boolean.TRUE.equals(user.getEmailNotificationsEnabled());
         user.setEmailNotificationsEnabled(newState);
         userRepository.save(user);
-        return user;
+
+    }
+
+    public List<User> getAllSubsUsers(){
+        return userRepository.findUsersByIsSubscribed(Boolean.TRUE);
+    }
+
+    public List<User> getAllUnsubsUsers(){
+        return userRepository.findUsersByIsSubscribed(Boolean.FALSE);
     }
 }
