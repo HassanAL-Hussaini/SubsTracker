@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1/spending_analysis")
+@RequestMapping("/api/v1/spending-analysis")
 public class SpendingAnalysisController {
     private final SpendingAnalysisService spendingAnalysisService;
 

@@ -22,7 +22,7 @@ public class AiSubscriptionAlternativeController {
         return ResponseEntity.status(200).body(alt);
     }
 
-    @GetMapping("/get/Ai-subscription-alternative-DTO/{userId}/{subscriptionId}")
+    @GetMapping("/get/ai-subscription-alternative-DTO/{userId}/{subscriptionId}")
     public ResponseEntity<?> getAiAlterDTOBySubId(@PathVariable Integer userId, @PathVariable Integer subscriptionId){
         return ResponseEntity.status(200).body(aiSubscriptionAlternativeService.getAiSubscriptionAlternativeDTOOutBySubscriptionId(userId,subscriptionId));
     }
