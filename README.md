@@ -87,6 +87,14 @@ This document highlights the **major contributions and endpoints** I developed f
 
 ---
 
+## 🗄️ Database Design
+
+Below is the **ERD diagram** that represents the database structure I designed and implemented for the SubsTracker project:
+
+![Database Design](Untitled%20diagram%20_%20Mermaid%20Chart-2025-08-23-010749.png)
+
+---
+
 ## 👤 Author
 **Hassan Al Hossaini**  
 Full Stack Developer | Backend Focus (Spring Boot, React, PostgreSQL)  
