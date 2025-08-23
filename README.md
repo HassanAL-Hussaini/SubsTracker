@@ -4,6 +4,34 @@ This document highlights the **major contributions and endpoints** I developed f
 
 ---
 
+## 💡 Core Idea 
+- SubsTracker helps users manage all their subscriptions—whether **digital** (like Netflix, Shahid, Spotify) or **service-based** (like gym memberships, car washes).  
+- The platform not only tracks and organizes subscriptions but also integrates **AI-powered financial analysis** and **payment automation**.  
+
+---
+
+## ⚙️ Key Features
+
+### 🔐 Subscription Management
+- Add, update, and delete subscriptions.  
+- Keep track of active vs. expired subscriptions.  
+
+### 🤖 AI-Driven Insights
+- Analyze user spending habits.  
+- Suggest cheaper or more competitive alternatives.  
+- Provide personalized financial recommendations.  
+
+### 💳 Payment Automation
+- Securely process payments via **Moyasar Gateway**.  
+- Save and manage payment cards.  
+- Check transaction status directly through the app.  
+
+### 👥 User Management
+- Differentiate between subscribed and unsubscribed users.  
+- Allow admins to view all active customers.  
+
+---
+
 ## 🚀 My Core Contributions
 - **Designed and implemented key AI-powered and Payment-related endpoints.**
 - **Structured the program architecture** to maintain clean, modular, and scalable code.
